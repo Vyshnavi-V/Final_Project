@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
-public class CubeGenerator : MonoBehaviour
+public class BubbleSort : MonoBehaviour
 {
     public GameObject cubePrefab;
     public TMP_InputField userInputField;
@@ -68,7 +68,7 @@ public class CubeGenerator : MonoBehaviour
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
             // Update currentX for the next cube
-            currentX += spacing * 2; // Double the spacing to ensure even spacing
+            currentX += spacing * 22; // Double the spacing to ensure even spacing
 
             cubes[i] = cube; // Store reference to the cube in the array
 
@@ -85,7 +85,7 @@ public class CubeGenerator : MonoBehaviour
 
                     // Set font size based on cube size
                     float cubeSize = 24.2f; // Adjust this value based on your cube size
-                    float fontSizeMultiplier = 0.05f; // Adjust this multiplier as needed
+                    float fontSizeMultiplier = 2.5f; // Adjust this multiplier as needed
                     textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
                 }
                 else
