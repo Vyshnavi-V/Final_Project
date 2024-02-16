@@ -6,17 +6,23 @@ using System.Collections;
 public class BubbleSort : MonoBehaviour
 {
     public GameObject cubePrefab;
+    public GameObject indexTextPrefab;
     public TMP_InputField userInputField;
     public Button submitButton;
     public float spacing = 2f;
     public Color textColor = Color.white;
     public Color comparisonColor = Color.yellow; // Color for cubes being compared
+    public Color sortedColor = Color.green;
     public float sortingDelay = 1f; // Delay before starting the sorting process
     public float swapSpeed = 12f;
+    public GameObject iterationCanvasPrefab;
 
+    private TextMeshProUGUI iterationText;
     private GameObject[] cubes;
+    private GameObject[] indexTexts;
     private bool sortingInProgress = false;
     private bool paused = false;
+    private int iterations = 0;
 
     private void Start()
     {
@@ -52,31 +58,43 @@ public class BubbleSort : MonoBehaviour
 
         // Calculate starting position
         float startX = -totalWidth / 2f;
+        // Calculate position for iteration text
+        Vector3 iterationTextPosition = new Vector3(startX - 0.5f, 0f, 0f); // Adjust position as needed
+
+        // Create and position the iteration text
+        CreateIterationText(iterationTextPosition);
 
         // Initialize currentX to starting position
         float currentX = startX;
 
         cubes = new GameObject[numbers.Length]; // Initialize the array to store cube references
+        indexTexts = new GameObject[numbers.Length];
 
         for (int i = 0; i < numbers.Length; i++)
         {
             // Use the current position for each cube
             Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+            Vector3 indexPosition = new Vector3(currentX, -4f, 0f);
 
             Debug.Log("Position of cube " + (i + 1) + ": " + cubePosition); // Debug print
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+            GameObject index = Instantiate(indexTextPrefab, indexPosition, Quaternion.identity);
 
             // Update currentX for the next cube
             currentX += spacing * 22; // Double the spacing to ensure even spacing
 
             cubes[i] = cube; // Store reference to the cube in the array
+            indexTexts[i] = index;
 
             // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
             Canvas canvas = cube.GetComponentInChildren<Canvas>();
+            Canvas indexcanvas = index.GetComponentInChildren < Canvas>();
             if (canvas != null)
             {
                 TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
+                TextMeshProUGUI indexTextMesh = indexcanvas.GetComponentInChildren<TextMeshProUGUI>();
+
                 if (textMesh != null)
                 {
                     textMesh.text = numbers[i];
@@ -87,10 +105,20 @@ public class BubbleSort : MonoBehaviour
                     float cubeSize = 24.2f; // Adjust this value based on your cube size
                     float fontSizeMultiplier = 2.5f; // Adjust this multiplier as needed
                     textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
+                    
                 }
                 else
                 {
                     Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube prefab.");
+                }
+                if (indexTextMesh != null)
+                {
+                    indexTextMesh.text = (i + 1).ToString();
+                    //indexTextMesh.text.fontSize = Mathf.RoundToInt(24.2f * 2.5f);
+                }
+                else
+                {
+                    Debug.LogError("TextMeshProUGUI component not found in the children of the index text prefab.");
                 }
             }
             else
@@ -102,37 +130,49 @@ public class BubbleSort : MonoBehaviour
         StartCoroutine(BubbleSortCoroutine());
     }
 
-    public void PauseSorting()
+    private void CreateIterationText(Vector3 position)
     {
-        paused = true;
-    }
+        // Instantiate the IterationCanvas prefab
+        GameObject iterationCanvasGO = Instantiate(iterationCanvasPrefab, Vector3.zero, Quaternion.identity);
 
-    public void ResumeSorting()
-    {
-        paused = false;
-    }
+        // Set the parent of the IterationCanvas to be the current GameObject (this object)
+        iterationCanvasGO.transform.SetParent(transform, false);
 
-    public void ReplaySorting()
-    {
-        StopAllCoroutines(); // Stop any ongoing sorting coroutine
-        sortingInProgress = false;
-        paused = false;
-        GenerateCubes(); // Regenerate cubes and start sorting again
-    }
+        // Get the TextMeshProUGUI component from the IterationCanvas
+        iterationText = iterationCanvasGO.GetComponentInChildren<TextMeshProUGUI>();
+        if (iterationText != null)
+        {
+            // Set initial text value
+            iterationText.text = "Iteration: 1";
+        }
+        else
+        {
+            Debug.LogError("TextMeshProUGUI component not found in the IterationCanvas prefab.");
+        }
 
+        // Set the position of the IterationCanvas
+        iterationCanvasGO.transform.localPosition = position;
+    }
     private IEnumerator BubbleSortCoroutine()
     {
         yield return new WaitForSeconds(sortingDelay);
 
         int n = cubes.Length;
-        bool swapped;
 
-        do
+        // Perform bubble sort iterations
+        for (int iteration = 1; iteration < n; iteration++)
         {
-            swapped = false;
+            bool swapped = false; // Initialize swapped flag
+            if(iterationText != null)
+            {
+                iterationText.text = "Iteration: " + iteration;
+            }
+
             for (int i = 1; i < n; i++)
             {
+
                 // Change color of cubes being compared
+
                 cubes[i].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
                 cubes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
 
@@ -159,7 +199,7 @@ public class BubbleSort : MonoBehaviour
                     cubes[i] = cubes[i - 1];
                     cubes[i - 1] = tempCube;
 
-                    swapped = true;
+                    swapped = true; // Set swapped flag to true
                 }
 
                 // Reset color after comparison
@@ -173,9 +213,39 @@ public class BubbleSort : MonoBehaviour
 
                 yield return new WaitForSeconds(0.5f); // Adjust the delay as needed for visualization
             }
-            n--;
-        } while (swapped);
 
-        sortingInProgress = false; // Sorting is complete
+            // Increment iterations counter
+            iterations++;
+
+            // Check if no swaps occurred in this iteration
+            /*if (!swapped)
+            {
+                break; // Exit the sorting loop if no swaps occurred
+            }*/
+        }
+
+        sortingInProgress = false;
+        iterationText.text = "Sorted";// Sorting is complete
+    }
+
+    public void PauseSorting()
+    {
+        paused = true;
+    }
+
+    public void ResumeSorting()
+    {
+        paused = false;
+    }
+
+    public void ReplaySorting()
+    {
+        StopAllCoroutines(); // Stop any ongoing sorting coroutine
+        sortingInProgress = false;
+        paused = false;
+        iterations = 0; // Reset iterations counter
+        GenerateCubes(); // Regenerate cubes and start sorting again
     }
 }
+
+     
