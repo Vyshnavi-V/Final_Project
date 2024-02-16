@@ -11191,7 +11191,7 @@ MonoBehaviour:
   textColor: {r: 1, g: 1, b: 1, a: 1}
   comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   sortingDelay: 1
-  swapSpeed: 30
+  swapSpeed: 50
 --- !u!1 &846084843
 GameObject:
   m_ObjectHideFlags: 0
