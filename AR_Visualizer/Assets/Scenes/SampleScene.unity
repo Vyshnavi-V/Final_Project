@@ -4240,7 +4240,7 @@ PrefabInstance:
     - target: {fileID: 2512387469002778308, guid: 48cb3fb68c91eb94999fd99957eb0cae,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 753.3195
+      value: 755.18
       objectReference: {fileID: 0}
     - target: {fileID: 2512387469002778308, guid: 48cb3fb68c91eb94999fd99957eb0cae,
         type: 3}
@@ -11317,6 +11317,7 @@ MonoBehaviour:
   iterationCanvasPrefab: {fileID: 4784290518602140100, guid: 10ca5a451b1e65f498936e2930852b6a,
     type: 3}
   bubbleInputCanvas: {fileID: 1872701304}
+  mainCamera: {fileID: 1085726234}
 --- !u!1 &846084843
 GameObject:
   m_ObjectHideFlags: 0

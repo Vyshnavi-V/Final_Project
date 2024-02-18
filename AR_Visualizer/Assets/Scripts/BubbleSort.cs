@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class CubeGenerator : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class CubeGenerator : MonoBehaviour
     public float swapSpeed = 12f;
     public GameObject iterationCanvasPrefab;
     public GameObject bubbleInputCanvas; // Reference to the BubbleInputCanvas
+    public Camera mainCamera;
 
     private TextMeshProUGUI iterationText;
     private GameObject[] cubes;
@@ -30,9 +32,12 @@ public class CubeGenerator : MonoBehaviour
     {
         submitButton.onClick.AddListener(GenerateCubes);
     }
-
+   
+  
+    
     public void GenerateCubes()
     {
+        
         if (sortingInProgress)
         {
             return;
@@ -41,13 +46,13 @@ public class CubeGenerator : MonoBehaviour
         sortingInProgress = true;
 
         // Hide the BubbleInputCanvas
-        bubbleInputCanvas.SetActive(false);
 
         // Destroy previous cubes and indexes
         DestroyCubesAndIndexes();
 
         string userInput = userInputField.text;
         string[] numbers = userInput.Split(',');
+        //bubbleInputCanvas.SetActive(false);
 
         // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
@@ -77,12 +82,12 @@ public class CubeGenerator : MonoBehaviour
             // Set up cube and index UI
             SetupCubeAndIndexUI(cube, index, numbers[i], i);
         }
-
+        PositionCamera();
         // Start sorting coroutine
         StartCoroutine(BubbleSortCoroutine());
 
         // Focus main camera on the cubes
-        FocusMainCameraOnCubes();
+        //FocusMainCameraOnCubes();
     }
 
     private void DestroyCubesAndIndexes()
@@ -102,6 +107,9 @@ public class CubeGenerator : MonoBehaviour
                 Destroy(index);
             }
         }
+
+        
+     
     }
 
     private void SetupCubeAndIndexUI(GameObject cube, GameObject index, string number, int indexNumber)
@@ -225,30 +233,18 @@ public class CubeGenerator : MonoBehaviour
         sortingInProgress = false;
         iterationText.text = "Sorted";
     }
-
-    private void FocusMainCameraOnCubes()
-{
-    if (cubes != null && cubes.Length > 0)
+    
+    private void PositionCamera()
     {
-        Bounds bounds = new Bounds(cubes[0].transform.position, Vector3.zero);
+        // Calculate the center position of the cubes
+        float totalWidth = (cubes.Length - 1) * spacing;
+        float startX = -totalWidth / 2f;
+        float centerY = -1000f;
 
-        foreach (GameObject cube in cubes)
-        {
-            bounds.Encapsulate(cube.transform.position);
-        }
-
-        // Calculate the desired distance from the cubes
-        float desiredDistance = Mathf.Max(bounds.extents.x, bounds.extents.y, bounds.extents.z) / Mathf.Tan(Mathf.Deg2Rad * Camera.main.fieldOfView / 2f);
-
-        // Set the camera position to look at the center of the cube bounds from the desired distance
-        Camera.main.transform.position = bounds.center - Camera.main.transform.forward * desiredDistance;
-
-        // Ensure that the camera is looking at the center of the cube bounds
-        Camera.main.transform.LookAt(bounds.center);
+        // Set camera position to view the cubes
+        mainCamera.transform.position = new Vector3(startX, centerY, -10f); // Adjust -10f based on your scene
+        mainCamera.transform.rotation = Quaternion.identity;
     }
-}
-
-
     public void PauseSorting()
     {
         paused = true;
