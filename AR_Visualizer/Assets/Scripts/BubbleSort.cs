@@ -52,7 +52,7 @@ public class CubeGenerator : MonoBehaviour
 
         string userInput = userInputField.text;
         string[] numbers = userInput.Split(',');
-        //bubbleInputCanvas.SetActive(false);
+        bubbleInputCanvas.SetActive(false);
 
         // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
