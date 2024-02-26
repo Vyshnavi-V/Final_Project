@@ -12555,6 +12555,7 @@ GameObject:
   - component: {fileID: 845395790}
   - component: {fileID: 845395791}
   - component: {fileID: 845395792}
+  - component: {fileID: 845395793}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -12642,6 +12643,29 @@ MonoBehaviour:
   comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   sortingDelay: 1
   swapSpeed: 3
+--- !u!114 &845395793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845395788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74341196a8e04b14faebffd892ccff93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
+    type: 3}
+  inputField: {fileID: 1396600954}
+  spacing: 2
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+  comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  sortingDelay: 2
+  swapSpeed: 12
+  linePrefab: {fileID: 0}
+  divisionDelay: 2
+  lineMaterial: {fileID: 0}
 --- !u!1 &846084843
 GameObject:
   m_ObjectHideFlags: 0
@@ -18668,7 +18692,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1205570644
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19480,7 +19504,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1264505440
 RectTransform:
   m_ObjectHideFlags: 0
