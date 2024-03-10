@@ -1,3 +1,5 @@
+
+
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -32,12 +34,12 @@ public class CubeGenerator : MonoBehaviour
     {
         submitButton.onClick.AddListener(GenerateCubes);
     }
-   
-  
-    
+
+
+
     public void GenerateCubes()
     {
-        
+
         if (sortingInProgress)
         {
             return;
@@ -108,8 +110,8 @@ public class CubeGenerator : MonoBehaviour
             }
         }
 
-        
-     
+
+
     }
 
     private void SetupCubeAndIndexUI(GameObject cube, GameObject index, string number, int indexNumber)
@@ -233,7 +235,7 @@ public class CubeGenerator : MonoBehaviour
         sortingInProgress = false;
         iterationText.text = "Sorted";
     }
-    
+
     private void PositionCamera()
     {
         // Calculate the center position of the cubes
