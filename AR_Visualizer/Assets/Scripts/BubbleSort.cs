@@ -12,7 +12,7 @@ public class CubeGenerator : MonoBehaviour
     public GameObject indexPrefab;
     public TMP_InputField userInputField;
     public Button submitButton;
-    public float spacing = 2f;
+    public float spacing = 1f;
     public Color textColor = Color.white;
     public Color indexColor = Color.black;
     public Color comparisonColor = Color.yellow;
@@ -71,12 +71,12 @@ public class CubeGenerator : MonoBehaviour
         for (int i = 0; i < numbers.Length; i++)
         {
             Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-            Vector3 indexPosition = new Vector3(currentX, -300f, 0f);
+            Vector3 indexPosition = new Vector3(currentX, -250f, 0f);
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
 
-            currentX += spacing * 22;
+            currentX += spacing * 12;
 
             cubes[i] = cube;
             indexes[i] = index;
@@ -84,7 +84,7 @@ public class CubeGenerator : MonoBehaviour
             // Set up cube and index UI
             SetupCubeAndIndexUI(cube, index, numbers[i], i);
         }
-        PositionCamera();
+        //PositionCamera();
         // Start sorting coroutine
         StartCoroutine(BubbleSortCoroutine());
 
@@ -235,7 +235,7 @@ public class CubeGenerator : MonoBehaviour
         sortingInProgress = false;
         iterationText.text = "Sorted";
     }
-
+    /*
     private void PositionCamera()
     {
         // Calculate the center position of the cubes
@@ -247,6 +247,7 @@ public class CubeGenerator : MonoBehaviour
         mainCamera.transform.position = new Vector3(startX, centerY, -10f); // Adjust -10f based on your scene
         mainCamera.transform.rotation = Quaternion.identity;
     }
+    */
     public void PauseSorting()
     {
         paused = true;
