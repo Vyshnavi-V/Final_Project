@@ -191,7 +191,7 @@ public class quicksort : MonoBehaviour
 
                     while (left <= right && leftValue <= pivotValue)
                     {
-                        yield return StartCoroutine(TraverseCube(generatedCubes[level][left], Color.yellow)); // Highlight i in yellow
+                        yield return StartCoroutine(TraverseCube(generatedCubes[level][left], Color.yellow, true)); // Highlight i in yellow
                         left++;
                         if (left <= right)
                         {
@@ -201,7 +201,7 @@ public class quicksort : MonoBehaviour
 
                     while (left <= right && rightValue > pivotValue)
                     {
-                        yield return StartCoroutine(TraverseCube(generatedCubes[level][right], Color.green)); // Highlight j in green
+                        yield return StartCoroutine(TraverseCube(generatedCubes[level][right], Color.green, false, true)); // Highlight j in green
                         right--;
                         if (left <= right)
                         {
@@ -242,64 +242,64 @@ public class quicksort : MonoBehaviour
     }
 
     private IEnumerator SwapCubes(List<GameObject> cubes, int index1, int index2, int pivotIndex)
-{
-    GameObject cube1 = cubes[index1];
-    GameObject cube2 = cubes[index2];
-
-    Vector3 initialPos1 = cube1.transform.position;
-    Vector3 initialPos2 = cube2.transform.position;
-    float swapDuration = 1f;
-
-    // Highlight pivot cube in red
-    HighlightCube(cubes[pivotIndex], Color.red);
-
-    // Highlight low cube in yellow and high cube in green
-    HighlightCube(cubes[index1], index1 == pivotIndex ? Color.red : Color.yellow);
-    HighlightCube(cubes[index2], index2 == pivotIndex ? Color.red : Color.green);
-
-    // Delay for visualization
-    yield return new WaitForSeconds(0.5f);
-
-    // Move cubes up
-    float cubeHeight = cube1.GetComponent<Renderer>().bounds.size.y;
-    float startTime = Time.time;
-    while (Time.time - startTime < swapDuration)
     {
-        float fracJourney = (Time.time - startTime) / swapDuration;
-        cube1.transform.position = Vector3.Lerp(initialPos1, initialPos1 + Vector3.up * cubeHeight, fracJourney);
-        cube2.transform.position = Vector3.Lerp(initialPos2, initialPos2 + Vector3.up * cubeHeight, fracJourney);
-        yield return null;
+        GameObject cube1 = cubes[index1];
+        GameObject cube2 = cubes[index2];
+
+        Vector3 initialPos1 = cube1.transform.position;
+        Vector3 initialPos2 = cube2.transform.position;
+        float swapDuration = 1f;
+
+        // Highlight pivot cube in red
+        HighlightCube(cubes[pivotIndex], Color.red, true);
+
+        // Highlight low cube in yellow and high cube in green
+        HighlightCube(cubes[index1], Color.yellow, false, true);
+        HighlightCube(cubes[index2], Color.green, false, true);
+
+        // Delay for visualization
+        yield return new WaitForSeconds(0.5f);
+
+        // Move cubes up
+        float cubeHeight = cube1.GetComponent<Renderer>().bounds.size.y;
+        float startTime = Time.time;
+        while (Time.time - startTime < swapDuration)
+        {
+            float fracJourney = (Time.time - startTime) / swapDuration;
+            cube1.transform.position = Vector3.Lerp(initialPos1, initialPos1 + Vector3.up * cubeHeight, fracJourney);
+            cube2.transform.position = Vector3.Lerp(initialPos2, initialPos2 + Vector3.up * cubeHeight, fracJourney);
+            yield return null;
+        }
+
+        // Swap cubes in the list
+        GameObject temp = cubes[index1];
+        cubes[index1] = cubes[index2];
+        cubes[index2] = temp;
+
+        // Swap text positions
+        SwapTextPositions(cubes[index1], cubes[index2]);
+
+        // Move cubes down to their new positions
+        startTime = Time.time;
+        while (Time.time - startTime < swapDuration)
+        {
+            float fracJourney = (Time.time - startTime) / swapDuration;
+            cube1.transform.position = Vector3.Lerp(initialPos1 + Vector3.up * cubeHeight, initialPos2, fracJourney);
+            cube2.transform.position = Vector3.Lerp(initialPos2 + Vector3.up * cubeHeight, initialPos1, fracJourney);
+            yield return null;
+        }
+
+        // Ensure exact final positions (optional)
+        cube1.transform.position = initialPos2;
+        cube2.transform.position = initialPos1;
+
+        // Reset cube colors after swapping, except for cubes just before the pivot
+        if (index1 != pivotIndex && index2 != pivotIndex)
+        {
+            HighlightCube(cubes[index1], textColor);
+            HighlightCube(cubes[index2], textColor);
+        }
     }
-
-    // Swap cubes in the list
-    GameObject temp = cubes[index1];
-    cubes[index1] = cubes[index2];
-    cubes[index2] = temp;
-
-    // Swap text positions
-    SwapTextPositions(cubes[index1], cubes[index2]);
-
-    // Move cubes down to their new positions
-    startTime = Time.time;
-    while (Time.time - startTime < swapDuration)
-    {
-        float fracJourney = (Time.time - startTime) / swapDuration;
-        cube1.transform.position = Vector3.Lerp(initialPos1 + Vector3.up * cubeHeight, initialPos2, fracJourney);
-        cube2.transform.position = Vector3.Lerp(initialPos2 + Vector3.up * cubeHeight, initialPos1, fracJourney);
-        yield return null;
-    }
-
-    // Ensure exact final positions (optional)
-    cube1.transform.position = initialPos2;
-    cube2.transform.position = initialPos1;
-
-    // Reset cube colors after swapping, except for cubes just before the pivot
-    if (index1 != pivotIndex && index2 != pivotIndex)
-    {
-        HighlightCube(cubes[index1], textColor);
-        HighlightCube(cubes[index2], textColor);
-    }
-}
 
 
     private void SwapTextPositions(GameObject cube1, GameObject cube2)
@@ -313,14 +313,14 @@ public class quicksort : MonoBehaviour
         textMesh2.transform.localPosition = tempPos;
     }
 
-    private IEnumerator TraverseCube(GameObject cube, Color color)
+    private IEnumerator TraverseCube(GameObject cube, Color color, bool isLow = false, bool isHigh = false)
     {
-        HighlightCube(cube, color);
+        HighlightCube(cube, color, false, isLow, isHigh);
         yield return new WaitForSeconds(2f); // Delay for visualization
         HighlightCube(cube, textColor); // Reset cube color back to white
     }
 
-    private void HighlightCube(GameObject cube, Color color, bool isPivot = false)
+    private void HighlightCube(GameObject cube, Color color, bool isPivot = false, bool isLow = false, bool isHigh = false)
     {
         TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
         if (textMesh != null)
@@ -330,6 +330,49 @@ public class quicksort : MonoBehaviour
             {
                 // Ensure pivot is always highlighted in red
                 textMesh.color = Color.red;
+                EnableText(cube, "pText");
+            }
+            else if (isLow)
+            {
+                EnableText(cube, "iText");
+            }
+            else if (isHigh)
+            {
+                EnableText(cube, "jText");
+            }
+            else
+            {
+                // Reset other texts
+                textMesh.color = textColor;
+                DisableText(cube, "iText");
+                DisableText(cube, "jText");
+                DisableText(cube, "pText");
+            }
+        }
+    }
+
+    private void EnableText(GameObject cube, string textObjectName)
+    {
+        Transform pointerCanvas = cube.transform.Find("PointerCanvas");
+        if (pointerCanvas != null)
+        {
+            Transform textObject = pointerCanvas.Find(textObjectName);
+            if (textObject != null)
+            {
+                textObject.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private void DisableText(GameObject cube, string textObjectName)
+    {
+        Transform pointerCanvas = cube.transform.Find("PointerCanvas");
+        if (pointerCanvas != null)
+        {
+            Transform textObject = pointerCanvas.Find(textObjectName);
+            if (textObject != null)
+            {
+                textObject.gameObject.SetActive(false);
             }
         }
     }
@@ -349,7 +392,7 @@ public class quicksort : MonoBehaviour
 
         generatedCubes.Add(clonedCubes);
     }
-       // Method to pause the sorting process
+    // Method to pause the sorting process
     public void PauseSorting()
     {
         if (sortingInProgress && !paused)
@@ -369,5 +412,5 @@ public class quicksort : MonoBehaviour
             StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0)); // Resume the coroutine
         }
     }
-   
+
 }
