@@ -4357,7 +4357,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &234338168
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5684,7 +5684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &368268157
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13587,17 +13587,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 042fa92f0df294f418965b67b1fa7112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cubePrefab: {fileID: 0}
-  inputField: {fileID: 0}
-  inputCanvas: {fileID: 0}
-  mainCamera: {fileID: 0}
+  cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
+    type: 3}
+  inputField: {fileID: 737718906}
+  inputCanvas: {fileID: 368268156}
+  mainCamera: {fileID: 1085726234}
   spacing: 5
   textColor: {r: 1, g: 1, b: 1, a: 1}
   sortedColor: {r: 0, g: 1, b: 0, a: 1}
   smallestColor: {r: 1, g: 0, b: 0, a: 1}
   sortingDelay: 1
   swapSpeed: 12
-  iterationText: {fileID: 0}
+  iterationText: {fileID: 1794969488}
 --- !u!114 &845395795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30352,6 +30353,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3.75
+--- !u!114 &1794969488 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5301384948724001252, guid: 10ca5a451b1e65f498936e2930852b6a,
+    type: 3}
+  m_PrefabInstance: {fileID: 7698370493735513271}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1798542822
 GameObject:
   m_ObjectHideFlags: 0
