@@ -4,26 +4,29 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-public class quicksort : MonoBehaviour
+public class Quicksort : MonoBehaviour
 {
     public GameObject cubePrefab;
     public TMP_InputField inputField;
     public GameObject inputCanvas;
-    public Button randomButton; // Corrected reference to the Button component
+    public Button randomButton;
     public Camera mainCamera;
     public float spacing = 2f;
     public Color textColor = Color.black;
-    public Color comparisonColor = Color.yellow; // Color for cubes being compared
-    public float sortingDelay = 1f; // Delay before starting the sorting process
+    public Color comparisonColor = Color.yellow;
+    public float sortingDelay = 1f;
     public float swapSpeed = 3f;
 
-    private List<List<GameObject>> generatedCubes = new List<List<GameObject>>(); // Stores generated cubes for each partition level
+    public TextMeshProUGUI lowText;
+    public TextMeshProUGUI highText;
+    public TextMeshProUGUI pivotText;
+
+    private List<List<GameObject>> generatedCubes = new List<List<GameObject>>();
     private bool sortingInProgress = false;
     private bool paused = false;
 
     private void Start()
     {
-        // Add a listener to the RandomButton
         randomButton.onClick.AddListener(GenerateRandomNumbers);
     }
 
@@ -31,19 +34,15 @@ public class quicksort : MonoBehaviour
     {
         if (sortingInProgress)
         {
-            // If sorting is already in progress, ignore the button click
             return;
         }
 
-        sortingInProgress = true; // Set flag to indicate sorting is in progress
+        sortingInProgress = true;
 
-        // Disable input canvas
         inputCanvas.SetActive(false);
 
-        // Generate random numbers
-        string[] randomNumbers = GenerateRandomArray(5); // Generating numbers of length 5
+        string[] randomNumbers = GenerateRandomArray(5);
 
-        // Generate initial set of cubes
         GenerateInitialCubes(randomNumbers);
     }
 
@@ -57,21 +56,17 @@ public class quicksort : MonoBehaviour
         return randomArray;
     }
 
-
-
     public void GenerateCubes()
     {
         if (sortingInProgress)
         {
-            // If sorting is already in progress, ignore the button click
             return;
         }
 
-        sortingInProgress = true; // Set flag to indicate sorting is in progress
+        sortingInProgress = true;
 
         if (generatedCubes.Count > 0)
         {
-            // Clean up previously generated cubes for all levels
             foreach (List<GameObject> levelCubes in generatedCubes)
             {
                 foreach (GameObject cube in levelCubes)
@@ -81,45 +76,32 @@ public class quicksort : MonoBehaviour
             }
         }
 
-        inputCanvas.SetActive(false); // Disable input canvas when submit button is clicked
+        inputCanvas.SetActive(false);
 
         string Nos = inputField.text;
         string[] numbers = Nos.Split(',');
 
-        Debug.Log("Number of elements in numbers array: " + numbers.Length); // Debug print
-
-        // Generate initial set of cubes
         GenerateInitialCubes(numbers);
     }
 
     private void GenerateInitialCubes(string[] numbers)
     {
-        // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
-
-        // Calculate starting position
         float startX = -totalWidth / 2f;
-
-        // Initialize currentX to starting position
         float currentX = startX;
 
         List<GameObject> initialCubes = new List<GameObject>();
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            // Use the current position for each cube
             Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-
-            Debug.Log("Position of cube " + (i + 1) + ": " + cubePosition); // Debug print
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
-            // Update currentX for the next cube
             currentX += spacing;
 
             initialCubes.Add(cube);
 
-            // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
             Canvas canvas = cube.GetComponentInChildren<Canvas>();
             if (canvas != null)
             {
@@ -150,7 +132,6 @@ public class quicksort : MonoBehaviour
     {
         if (generatedCubes.Count > 0 && mainCamera != null)
         {
-            // Calculate the bounds of all cubes
             Bounds bounds = new Bounds(generatedCubes[0][0].transform.position, Vector3.zero);
             foreach (List<GameObject> levelCubes in generatedCubes)
             {
@@ -160,10 +141,8 @@ public class quicksort : MonoBehaviour
                 }
             }
 
-            // Calculate the camera distance based on the bounds size
             float cameraDistance = bounds.size.magnitude / Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-            // Set camera position and rotation
             mainCamera.transform.position = bounds.center - mainCamera.transform.forward * cameraDistance;
             mainCamera.transform.LookAt(bounds.center);
         }
@@ -182,7 +161,7 @@ public class quicksort : MonoBehaviour
                 int left = low + 1;
                 int right = high;
 
-                HighlightCube(generatedCubes[level][pivotIndex], Color.red, true); // Highlight pivot cube with red color
+                HighlightCube(generatedCubes[level][pivotIndex], Color.red, true);
 
                 while (left <= right)
                 {
@@ -191,7 +170,7 @@ public class quicksort : MonoBehaviour
 
                     while (left <= right && leftValue <= pivotValue)
                     {
-                        yield return StartCoroutine(TraverseCube(generatedCubes[level][left], Color.yellow, true)); // Highlight i in yellow
+                        yield return StartCoroutine(TraverseCube(generatedCubes[level][left], Color.yellow, true));
                         left++;
                         if (left <= right)
                         {
@@ -201,7 +180,7 @@ public class quicksort : MonoBehaviour
 
                     while (left <= right && rightValue > pivotValue)
                     {
-                        yield return StartCoroutine(TraverseCube(generatedCubes[level][right], Color.green, false, true)); // Highlight j in green
+                        yield return StartCoroutine(TraverseCube(generatedCubes[level][right], Color.green, false, true));
                         right--;
                         if (left <= right)
                         {
@@ -211,12 +190,12 @@ public class quicksort : MonoBehaviour
 
                     if (left < right)
                     {
-                        yield return StartCoroutine(SwapCubes(generatedCubes[level], left, right, pivotIndex)); // Pass pivot index to SwapCubes
-                        yield return new WaitForSeconds(0.5f); // Delay for visualization
+                        yield return StartCoroutine(SwapCubes(generatedCubes[level], left, right, pivotIndex));
+                        yield return new WaitForSeconds(0.5f);
                     }
                 }
 
-                yield return StartCoroutine(SwapCubes(generatedCubes[level], pivotIndex, right, pivotIndex)); // Pass pivot index to SwapCubes
+                yield return StartCoroutine(SwapCubes(generatedCubes[level], pivotIndex, right, pivotIndex));
 
                 VisualizePartition(low, right, level);
 
@@ -230,9 +209,8 @@ public class quicksort : MonoBehaviour
             }
             else
             {
-                // Handle the case when there's only one element left in the partition
                 Debug.Log("Partition at level " + level + " contains only one element.");
-                yield return null; // No need to further partition, just return
+                yield return null;
             }
         }
         else
@@ -250,17 +228,12 @@ public class quicksort : MonoBehaviour
         Vector3 initialPos2 = cube2.transform.position;
         float swapDuration = 1f;
 
-        // Highlight pivot cube in red
         HighlightCube(cubes[pivotIndex], Color.red, true);
-
-        // Highlight low cube in yellow and high cube in green
         HighlightCube(cubes[index1], Color.yellow, false, true);
         HighlightCube(cubes[index2], Color.green, false, true);
 
-        // Delay for visualization
         yield return new WaitForSeconds(0.5f);
 
-        // Move cubes up
         float cubeHeight = cube1.GetComponent<Renderer>().bounds.size.y;
         float startTime = Time.time;
         while (Time.time - startTime < swapDuration)
@@ -271,15 +244,12 @@ public class quicksort : MonoBehaviour
             yield return null;
         }
 
-        // Swap cubes in the list
         GameObject temp = cubes[index1];
         cubes[index1] = cubes[index2];
         cubes[index2] = temp;
 
-        // Swap text positions
         SwapTextPositions(cubes[index1], cubes[index2]);
 
-        // Move cubes down to their new positions
         startTime = Time.time;
         while (Time.time - startTime < swapDuration)
         {
@@ -289,11 +259,9 @@ public class quicksort : MonoBehaviour
             yield return null;
         }
 
-        // Ensure exact final positions (optional)
         cube1.transform.position = initialPos2;
         cube2.transform.position = initialPos1;
 
-        // Reset cube colors after swapping, except for cubes just before the pivot
         if (index1 != pivotIndex && index2 != pivotIndex)
         {
             HighlightCube(cubes[index1], textColor);
@@ -301,10 +269,8 @@ public class quicksort : MonoBehaviour
         }
     }
 
-
     private void SwapTextPositions(GameObject cube1, GameObject cube2)
     {
-        // Swap positions of 'i', 'j', and 'p' texts
         TextMeshProUGUI textMesh1 = cube1.GetComponentInChildren<TextMeshProUGUI>();
         TextMeshProUGUI textMesh2 = cube2.GetComponentInChildren<TextMeshProUGUI>();
 
@@ -316,71 +282,85 @@ public class quicksort : MonoBehaviour
     private IEnumerator TraverseCube(GameObject cube, Color color, bool isLow = false, bool isHigh = false)
     {
         HighlightCube(cube, color, false, isLow, isHigh);
-        yield return new WaitForSeconds(2f); // Delay for visualization
-        HighlightCube(cube, textColor); // Reset cube color back to white
+        yield return new WaitForSeconds(2f);
+        HighlightCube(cube, textColor);
     }
-
-    private void HighlightCube(GameObject cube, Color color, bool isPivot = false, bool isLow = false, bool isHigh = false)
+private void HighlightCube(GameObject cube, Color color, bool isPivot = false, bool isLow = false, bool isHigh = false)
+{
+    TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
+    if (textMesh != null)
     {
-        TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
-        if (textMesh != null)
+        // Store the original text and position
+        string originalText = textMesh.text;
+        Vector3 originalPosition = textMesh.transform.position;
+
+        // Set the text color
+        textMesh.color = color;
+
+        // Set text position above the cube
+        Vector3 textPosition = cube.transform.position;
+        float yOffset = 0f;
+
+        if (isPivot)
         {
-            textMesh.color = color;
-            if (isPivot)
+            textMesh.color = Color.red;
+            EnableText(pivotText);
+            pivotText.transform.position = textPosition + Vector3.up * 130f; // Adjust pivot text position
+            yOffset = 1.5f;
+        }
+        else if (isHigh && !isLow)
+        {
+            EnableText(highText);
+            highText.transform.position = textPosition + Vector3.up * 130f; // Adjust high text position
+            yOffset = 0.5f;
+            // If the cube is both high and low, hide the "low" text
+            if (lowText.gameObject.activeSelf)
             {
-                // Ensure pivot is always highlighted in red
-                textMesh.color = Color.red;
-                EnableText(cube, "pText");
-            }
-            else if (isLow)
-            {
-                EnableText(cube, "iText");
-            }
-            else if (isHigh)
-            {
-                EnableText(cube, "jText");
-            }
-            else
-            {
-                // Reset other texts
-                textMesh.color = textColor;
-                DisableText(cube, "iText");
-                DisableText(cube, "jText");
-                DisableText(cube, "pText");
+                DisableText(lowText);
             }
         }
-    }
-
-    private void EnableText(GameObject cube, string textObjectName)
-    {
-        Transform pointerCanvas = cube.transform.Find("PointerCanvas");
-        if (pointerCanvas != null)
+        else if (isLow && !isHigh)
         {
-            Transform textObject = pointerCanvas.Find(textObjectName);
-            if (textObject != null)
+            EnableText(lowText);
+            lowText.transform.position = textPosition + Vector3.up * 130f; // Adjust low text position
+            yOffset = 1.0f;
+            // If the cube is both low and high, hide the "high" text
+            if (highText.gameObject.activeSelf)
             {
-                textObject.gameObject.SetActive(true);
+                DisableText(highText);
             }
         }
-    }
-
-    private void DisableText(GameObject cube, string textObjectName)
-    {
-        Transform pointerCanvas = cube.transform.Find("PointerCanvas");
-        if (pointerCanvas != null)
+        else
         {
-            Transform textObject = pointerCanvas.Find(textObjectName);
-            if (textObject != null)
-            {
-                textObject.gameObject.SetActive(false);
-            }
+            textMesh.color = textColor;
+            DisableText(lowText);
+            DisableText(highText);
         }
+
+        // Set the original text and position back
+        textMesh.text = originalText;
+        textMesh.transform.position = originalPosition + Vector3.up * yOffset; // Adjust the original position
     }
+}
+
+
+
+
+private void EnableText(TextMeshProUGUI textObject)
+{
+    textObject.gameObject.SetActive(true);
+}
+
+private void DisableText(TextMeshProUGUI textObject)
+{
+    textObject.gameObject.SetActive(false);
+}
+
 
     private void VisualizePartition(int low, int high, int level)
     {
         List<GameObject> clonedCubes = new List<GameObject>();
-        float yOffset = -700f * (generatedCubes.Count - level); // Adjust the offset based on the level
+        float yOffset = -700f * (generatedCubes.Count - level);
 
         for (int i = 0; i < generatedCubes[level].Count; i++)
         {
@@ -392,25 +372,23 @@ public class quicksort : MonoBehaviour
 
         generatedCubes.Add(clonedCubes);
     }
-    // Method to pause the sorting process
+
     public void PauseSorting()
     {
         if (sortingInProgress && !paused)
         {
             paused = true;
-            Time.timeScale = 0f; // Pause the time
+            Time.timeScale = 0f;
         }
     }
 
-    // Method to resume the sorting process
     public void PlaySorting()
     {
         if (sortingInProgress && paused)
         {
             paused = false;
-            Time.timeScale = 1f; // Resume the time
-            StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0)); // Resume the coroutine
+            Time.timeScale = 1f;
+            StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0));
         }
     }
-
 }

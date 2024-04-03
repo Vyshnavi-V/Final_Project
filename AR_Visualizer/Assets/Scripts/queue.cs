@@ -4,17 +4,19 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-public class queue : MonoBehaviour
+public class Queue : MonoBehaviour
 {
     public GameObject cubePrefab;
     public TMP_InputField inputField;
     public Button insertButton; // Button for enqueue operation
     public Button deleteButton; // Button for dequeue operation
+    public TextMeshProUGUI frontText; // Text for front pointer
+    public TextMeshProUGUI rearText; // Text for rear pointer
 
     private Queue<string> numberQueue = new Queue<string>(); // Queue to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = 1f; // Gap between cubes
+    private float gap = -10f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
     private float currentX = 0f; // Current X position for spawning cubes
     private bool isEnqueuing = false; // Flag to check if enqueuing is in progress
@@ -52,6 +54,7 @@ public class queue : MonoBehaviour
             }
         }
 
+        UpdateFrontAndRearTextPositions(); // Update positions of front and rear texts
         isEnqueuing = false;
     }
 
@@ -72,7 +75,7 @@ public class queue : MonoBehaviour
     private IEnumerator MoveCubeToPosition(GameObject cube, Vector3 finalPosition, string number)
     {
         // Instantiate the cube at an initial position far to the right
-        Vector3 initialPosition = finalPosition + Vector3.right * 700f;
+        Vector3 initialPosition = finalPosition + Vector3.right * 500f;
         GameObject newCube = Instantiate(cube, initialPosition, Quaternion.identity);
 
         // Set the number text of the cube
@@ -126,6 +129,8 @@ public class queue : MonoBehaviour
             {
                 Debug.LogError("Cube GameObject not found for dequeued number: " + dequeuedNumber);
             }
+
+            UpdateFrontAndRearTextPositions(); // Update positions of front and rear texts
         }
         else
         {
@@ -137,7 +142,7 @@ public class queue : MonoBehaviour
     private IEnumerator MoveAndDestroyCube(GameObject cube)
     {
         Vector3 initialPosition = cube.transform.position;
-        Vector3 finalPosition = initialPosition + Vector3.left * 700f;
+        Vector3 finalPosition = initialPosition + Vector3.left * 500f;
         float duration = 1.2f; // Duration of the movement
         float elapsedTime = 0f;
 
@@ -161,5 +166,30 @@ public class queue : MonoBehaviour
 
         // Destroy the cube
         Destroy(cube);
+    }
+
+    // Method to update the positions of front and rear texts above the cubes
+    private void UpdateFrontAndRearTextPositions()
+    {
+        if (numberQueue.Count > 0)
+        {
+            frontText.gameObject.SetActive(true);
+            rearText.gameObject.SetActive(true);
+
+            // Calculate the position for front text
+            string frontNumber = numberQueue.Peek();
+            Vector3 frontPosition = cubeDictionary[frontNumber].transform.position + new Vector3(80f, 150f, 0f);
+            frontText.transform.position = frontPosition;
+
+            // Calculate the position for rear text
+            string rearNumber = numberQueue.ToArray()[numberQueue.Count - 1];
+            Vector3 rearPosition = cubeDictionary[rearNumber].transform.position + new Vector3(130f, 150f, 0f);
+            rearText.transform.position = rearPosition;
+        }
+        else
+        {
+            frontText.gameObject.SetActive(false);
+            rearText.gameObject.SetActive(false);
+        }
     }
 }
