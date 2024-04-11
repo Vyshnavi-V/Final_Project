@@ -1,13 +1,12 @@
-
-
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using UnityEngine.XR.ARFoundation;
 
 public class CubeGenerator : MonoBehaviour
 {
+    public ARPlaneManager arPlaneManager; // Reference to the ARPlaneManager
     public GameObject cubePrefab;
     public GameObject indexPrefab;
     public TMP_InputField userInputField;
@@ -20,11 +19,10 @@ public class CubeGenerator : MonoBehaviour
     public Color sortedColor = Color.green;
     public float sortingDelay = 1f;
     public float swapSpeed = 12f;
-    public GameObject iterationCanvasPrefab;
     public GameObject bubbleInputCanvas; // Reference to the BubbleInputCanvas
     public Camera mainCamera;
 
-    private TextMeshProUGUI iterationText;
+    public TextMeshProUGUI iterationText;
     private GameObject[] cubes;
     private GameObject[] indexes;
     private bool sortingInProgress = false;
@@ -32,15 +30,48 @@ public class CubeGenerator : MonoBehaviour
 
     private void Start()
     {
-        submitButton.onClick.AddListener(GenerateCubes);
+        arPlaneManager.planesChanged += OnPlanesChanged;
+        //submitButton.onClick.AddListener(OnSubmitButtonClick);
     }
 
-
-
-    public void GenerateCubes()
+    private void OnPlanesChanged(ARPlanesChangedEventArgs args)
     {
+        foreach (var plane in args.added)
+        {
+            GenerateCubesOnPlane(plane);
+        }
+    }
 
-        if (sortingInProgress)
+    public void OnSubmitButtonClick()
+    {
+        // This method will be called when the submit button is clicked
+        // Generate cubes only if a plane is detected
+        // Assuming you want to use the first detected plane
+        bubbleInputCanvas.SetActive(false);
+        ARPlane plane = null;
+        foreach (var trackable in arPlaneManager.trackables)
+        {
+            if (trackable is ARPlane arPlane)
+            {
+                plane = arPlane;
+                break;
+            }
+        }
+
+        if (plane != null)
+        {
+            GenerateCubesOnPlane(plane);
+        }
+        else
+        {
+            Debug.LogError("No AR planes detected.");
+        }
+
+    }
+
+    public void GenerateCubesOnPlane(ARPlane plane)
+    {
+        if (sortingInProgress || cubes != null)
         {
             return;
         }
@@ -54,14 +85,12 @@ public class CubeGenerator : MonoBehaviour
 
         string userInput = userInputField.text;
         string[] numbers = userInput.Split(',');
-        bubbleInputCanvas.SetActive(false);
+        
 
         // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
         float startX = -totalWidth / 2f;
-        Vector3 iterationTextPosition = new Vector3(startX - 0.5f, 0f, 0f);
-
-        CreateIterationText(iterationTextPosition);
+        Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
 
         float currentX = startX;
 
@@ -70,13 +99,14 @@ public class CubeGenerator : MonoBehaviour
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-            Vector3 indexPosition = new Vector3(currentX, -250f, 0f);
+
+            Vector3 cubePosition = plane.transform.position + new Vector3(currentX, 0f, 100f); // Adjust position relative to the plane
+            Vector3 indexPosition = plane.transform.position + new Vector3(currentX, -100f, 0f); // Adjust position relative to the plane
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
 
-            currentX += spacing * 12;
+            currentX += spacing *2;
 
             cubes[i] = cube;
             indexes[i] = index;
@@ -84,13 +114,72 @@ public class CubeGenerator : MonoBehaviour
             // Set up cube and index UI
             SetupCubeAndIndexUI(cube, index, numbers[i], i);
         }
-        //PositionCamera();
+
+        // Create iteration text below index cubes
+
         // Start sorting coroutine
         StartCoroutine(BubbleSortCoroutine());
 
         // Focus main camera on the cubes
         //FocusMainCameraOnCubes();
     }
+// public void GenerateCubesOnPlane(ARPlane plane)
+// {
+//     if (sortingInProgress)
+//     {
+//         return;
+//     }
+
+//     sortingInProgress = true;
+
+//     // Hide the BubbleInputCanvas
+//     bubbleInputCanvas.SetActive(false);
+
+//     // Destroy previous cubes and indexes
+//     DestroyCubesAndIndexes();
+
+//     string userInput = userInputField.text;
+//     string[] numbers = userInput.Split(',');
+
+//     // Calculate total width
+//     float totalWidth = (numbers.Length - 1) * spacing;
+//     float startX = -totalWidth / 2f;
+//     Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
+
+//     float currentX = startX;
+
+//     cubes = new GameObject[numbers.Length];
+//     indexes = new GameObject[numbers.Length];
+
+//     // Get the local position and rotation of the plane
+//     Vector3 planePosition = plane.transform.localPosition;
+//     Quaternion planeRotation = plane.transform.localRotation;
+
+//     for (int i = 0; i < numbers.Length; i++)
+//     {
+//         // Calculate the position relative to the plane's local coordinate system
+//         Vector3 cubeLocalPosition = new Vector3(currentX, 0f, 0f);
+//         Vector3 indexLocalPosition = new Vector3(currentX, -100f, 0f);
+
+//         // Transform the local positions to world positions
+//         Vector3 cubePosition = plane.transform.TransformPoint(cubeLocalPosition);
+//         Vector3 indexPosition = plane.transform.TransformPoint(indexLocalPosition);
+
+//         GameObject cube = Instantiate(cubePrefab, cubePosition, planeRotation, plane.transform); // Set plane as parent
+//         GameObject index = Instantiate(indexPrefab, indexPosition, planeRotation, plane.transform); // Set plane as parent
+
+//         currentX += spacing;
+
+//         cubes[i] = cube;
+//         indexes[i] = index;
+
+//         // Set up cube and index UI
+//         SetupCubeAndIndexUI(cube, index, numbers[i], i);
+//     }
+
+//     // Start sorting coroutine
+//     StartCoroutine(BubbleSortCoroutine());
+// }
 
     private void DestroyCubesAndIndexes()
     {
@@ -109,9 +198,6 @@ public class CubeGenerator : MonoBehaviour
                 Destroy(index);
             }
         }
-
-
-
     }
 
     private void SetupCubeAndIndexUI(GameObject cube, GameObject index, string number, int indexNumber)
@@ -137,7 +223,7 @@ public class CubeGenerator : MonoBehaviour
                 float cubeSize = 24.2f;
                 float fontSizeMultiplier = 4f;
                 textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
-                indexTextMesh.fontSize = Mathf.RoundToInt(cubeSize * 3.5f);
+                indexTextMesh.fontSize = Mathf.RoundToInt(cubeSize * 4f);
             }
             else
             {
@@ -148,25 +234,6 @@ public class CubeGenerator : MonoBehaviour
         {
             Debug.LogError("Canvas component not found in the children of the cube or index prefab.");
         }
-    }
-
-    private void CreateIterationText(Vector3 position)
-    {
-        GameObject iterationCanvasGO = Instantiate(iterationCanvasPrefab, Vector3.zero, Quaternion.identity);
-        iterationCanvasGO.transform.SetParent(transform, false);
-
-        iterationText = iterationCanvasGO.GetComponentInChildren<TextMeshProUGUI>();
-
-        if (iterationText != null)
-        {
-            iterationText.text = "Iteration: 1";
-        }
-        else
-        {
-            Debug.LogError("TextMeshProUGUI component not found in the IterationCanvas prefab.");
-        }
-
-        iterationCanvasGO.transform.localPosition = position;
     }
 
     private IEnumerator BubbleSortCoroutine()
@@ -235,19 +302,7 @@ public class CubeGenerator : MonoBehaviour
         sortingInProgress = false;
         iterationText.text = "Sorted";
     }
-    /*
-    private void PositionCamera()
-    {
-        // Calculate the center position of the cubes
-        float totalWidth = (cubes.Length - 1) * spacing;
-        float startX = -totalWidth / 2f;
-        float centerY = -1000f;
 
-        // Set camera position to view the cubes
-        mainCamera.transform.position = new Vector3(startX, centerY, -10f); // Adjust -10f based on your scene
-        mainCamera.transform.rotation = Quaternion.identity;
-    }
-    */
     public void PauseSorting()
     {
         paused = true;
@@ -263,6 +318,6 @@ public class CubeGenerator : MonoBehaviour
         StopAllCoroutines();
         sortingInProgress = false;
         paused = false;
-        GenerateCubes();
+        //GenerateCubes();
     }
 }
