@@ -30,52 +30,18 @@ public class CubeGenerator : MonoBehaviour
 
     private void Start()
     {
-        arPlaneManager.planesChanged += OnPlanesChanged;
         //submitButton.onClick.AddListener(OnSubmitButtonClick);
     }
 
-    private void OnPlanesChanged(ARPlanesChangedEventArgs args)
-    {
-        foreach (var plane in args.added)
-        {
-            GenerateCubesOnPlane(plane);
-        }
-    }
+    
 
-    public void OnSubmitButtonClick()
-    {
-        // This method will be called when the submit button is clicked
-        // Generate cubes only if a plane is detected
-        // Assuming you want to use the first detected plane
-        bubbleInputCanvas.SetActive(false);
-        ARPlane plane = null;
-        foreach (var trackable in arPlaneManager.trackables)
-        {
-            if (trackable is ARPlane arPlane)
-            {
-                plane = arPlane;
-                break;
-            }
-        }
-
-        if (plane != null)
-        {
-            GenerateCubesOnPlane(plane);
-        }
-        else
-        {
-            Debug.LogError("No AR planes detected.");
-        }
-
-    }
-
-    public void GenerateCubesOnPlane(ARPlane plane)
+    public void GenerateCubes()
     {
         if (sortingInProgress || cubes != null)
         {
             return;
         }
-
+        bubbleInputCanvas.SetActive(false);
         sortingInProgress = true;
 
         // Hide the BubbleInputCanvas
@@ -100,8 +66,8 @@ public class CubeGenerator : MonoBehaviour
         for (int i = 0; i < numbers.Length; i++)
         {
 
-            Vector3 cubePosition = plane.transform.position + new Vector3(currentX, 0f, 100f); // Adjust position relative to the plane
-            Vector3 indexPosition = plane.transform.position + new Vector3(currentX, -100f, 0f); // Adjust position relative to the plane
+            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+            Vector3 indexPosition = new Vector3(currentX, -100f, 0f); // Adjust position relative to the plane
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
@@ -116,7 +82,16 @@ public class CubeGenerator : MonoBehaviour
         }
 
         // Create iteration text below index cubes
-
+PlaceOnPlane placeOnPlane = FindObjectOfType<PlaceOnPlane>();
+    if (placeOnPlane != null)
+    {
+        // Assign the generated cubes to the productAnchor field
+        placeOnPlane.productAnchor = cubes[0].transform.parent;
+    }
+    else
+    {
+        Debug.LogError("PlaceOnPlane script instance not found.");
+    }
         // Start sorting coroutine
         StartCoroutine(BubbleSortCoroutine());
 
