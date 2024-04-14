@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using UnityEngine.XR.ARFoundation;
+using System;
 
 public class CubeGenerator : MonoBehaviour
 {
@@ -21,140 +22,142 @@ public class CubeGenerator : MonoBehaviour
     public float swapSpeed = 12f;
     public GameObject bubbleInputCanvas; // Reference to the BubbleInputCanvas
     public Camera mainCamera;
+    public GameObject proAnchor;
 
     public TextMeshProUGUI iterationText;
     private GameObject[] cubes;
     private GameObject[] indexes;
     private bool sortingInProgress = false;
     private bool paused = false;
-
+    public GameObject placeOnPlaneObject;
     private void Start()
     {
         //submitButton.onClick.AddListener(OnSubmitButtonClick);
     }
 
-    
+  public void GenerateCubes()
+{
+    bubbleInputCanvas.SetActive(false);
 
-    public void GenerateCubes()
+    PlaceOnPlane placeOnPlane = placeOnPlaneObject.GetComponent<PlaceOnPlane>();
+    if ( sortingInProgress || cubes != null ||!placeOnPlane.PlaneDetected)
     {
-        if (sortingInProgress || cubes != null)
-        {
-            return;
-        }
-        bubbleInputCanvas.SetActive(false);
-        sortingInProgress = true;
+        Debug.Log("Plane Not Detected");
+        return;
+    }
 
-        // Hide the BubbleInputCanvas
+    // Your existing cube generation logic goes here...
+    bubbleInputCanvas.SetActive(false);
+    sortingInProgress = true;
 
-        // Destroy previous cubes and indexes
-        DestroyCubesAndIndexes();
+    // Hide the BubbleInputCanvas
 
-        string userInput = userInputField.text;
-        string[] numbers = userInput.Split(',');
-        
+    // Destroy previous cubes and indexes
+    DestroyCubesAndIndexes();
 
-        // Calculate total width
-        float totalWidth = (numbers.Length - 1) * spacing;
-        float startX = -totalWidth / 2f;
-        Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
+    string userInput = userInputField.text;
+    string[] numbers = userInput.Split(',');
 
-        float currentX = startX;
+    // Calculate total width
+    float totalWidth = (numbers.Length - 1) * spacing;
+    float startX = -totalWidth / 2f;
+    Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
 
-        cubes = new GameObject[numbers.Length];
-        indexes = new GameObject[numbers.Length];
+    float currentX = startX;
 
-        for (int i = 0; i < numbers.Length; i++)
-        {
+    cubes = new GameObject[numbers.Length];
+    indexes = new GameObject[numbers.Length];
 
-            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-            Vector3 indexPosition = new Vector3(currentX, -100f, 0f); // Adjust position relative to the plane
-
-            GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
-            GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
-
-            currentX += spacing *2;
-
-            cubes[i] = cube;
-            indexes[i] = index;
-
-            // Set up cube and index UI
-            SetupCubeAndIndexUI(cube, index, numbers[i], i);
-        }
-
-        // Create iteration text below index cubes
-PlaceOnPlane placeOnPlane = FindObjectOfType<PlaceOnPlane>();
-    if (placeOnPlane != null)
+    for (int i = 0; i < numbers.Length; i++)
     {
-        // Assign the generated cubes to the productAnchor field
-        placeOnPlane.productAnchor = cubes[0].transform.parent;
+        Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+        Vector3 indexPosition = new Vector3(currentX, -100f, 0f); // Adjust position relative to the plane
+
+        // Instantiate cube and index with ProductAnchor as parent
+        GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity, proAnchor.transform);
+        GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity, proAnchor.transform);
+
+        currentX += spacing*0.5f;
+
+        cubes[i] = cube;
+        indexes[i] = index;
+
+        // Set up cube and index UI
+        SetupCubeAndIndexUI(cube, index, numbers[i], i);
     }
-    else
-    {
-        Debug.LogError("PlaceOnPlane script instance not found.");
-    }
-        // Start sorting coroutine
-        StartCoroutine(BubbleSortCoroutine());
 
-        // Focus main camera on the cubes
-        //FocusMainCameraOnCubes();
-    }
-// public void GenerateCubesOnPlane(ARPlane plane)
-// {
-//     if (sortingInProgress)
-//     {
-//         return;
-//     }
+    StartCoroutine(BubbleSortCoroutine());
 
-//     sortingInProgress = true;
+    // Focus main camera on the cubes
+    //FocusMainCameraOnCubes();
+}
 
-//     // Hide the BubbleInputCanvas
-//     bubbleInputCanvas.SetActive(false);
 
-//     // Destroy previous cubes and indexes
-//     DestroyCubesAndIndexes();
 
-//     string userInput = userInputField.text;
-//     string[] numbers = userInput.Split(',');
+    // Focus main camera on the cubes
+    //FocusMainCameraOnCubes();
 
-//     // Calculate total width
-//     float totalWidth = (numbers.Length - 1) * spacing;
-//     float startX = -totalWidth / 2f;
-//     Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
 
-//     float currentX = startX;
 
-//     cubes = new GameObject[numbers.Length];
-//     indexes = new GameObject[numbers.Length];
 
-//     // Get the local position and rotation of the plane
-//     Vector3 planePosition = plane.transform.localPosition;
-//     Quaternion planeRotation = plane.transform.localRotation;
 
-//     for (int i = 0; i < numbers.Length; i++)
-//     {
-//         // Calculate the position relative to the plane's local coordinate system
-//         Vector3 cubeLocalPosition = new Vector3(currentX, 0f, 0f);
-//         Vector3 indexLocalPosition = new Vector3(currentX, -100f, 0f);
+    // public void GenerateCubesOnPlane(ARPlane plane)
+    // {
+    //     if (sortingInProgress)
+    //     {
+    //         return;
+    //     }
 
-//         // Transform the local positions to world positions
-//         Vector3 cubePosition = plane.transform.TransformPoint(cubeLocalPosition);
-//         Vector3 indexPosition = plane.transform.TransformPoint(indexLocalPosition);
+    //     sortingInProgress = true;
 
-//         GameObject cube = Instantiate(cubePrefab, cubePosition, planeRotation, plane.transform); // Set plane as parent
-//         GameObject index = Instantiate(indexPrefab, indexPosition, planeRotation, plane.transform); // Set plane as parent
+    //     // Hide the BubbleInputCanvas
+    //     bubbleInputCanvas.SetActive(false);
 
-//         currentX += spacing;
+    //     // Destroy previous cubes and indexes
+    //     DestroyCubesAndIndexes();
 
-//         cubes[i] = cube;
-//         indexes[i] = index;
+    //     string userInput = userInputField.text;
+    //     string[] numbers = userInput.Split(',');
 
-//         // Set up cube and index UI
-//         SetupCubeAndIndexUI(cube, index, numbers[i], i);
-//     }
+    //     // Calculate total width
+    //     float totalWidth = (numbers.Length - 1) * spacing;
+    //     float startX = -totalWidth / 2f;
+    //     Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
 
-//     // Start sorting coroutine
-//     StartCoroutine(BubbleSortCoroutine());
-// }
+    //     float currentX = startX;
+
+    //     cubes = new GameObject[numbers.Length];
+    //     indexes = new GameObject[numbers.Length];
+
+    //     // Get the local position and rotation of the plane
+    //     Vector3 planePosition = plane.transform.localPosition;
+    //     Quaternion planeRotation = plane.transform.localRotation;
+
+    //     for (int i = 0; i < numbers.Length; i++)
+    //     {
+    //         // Calculate the position relative to the plane's local coordinate system
+    //         Vector3 cubeLocalPosition = new Vector3(currentX, 0f, 0f);
+    //         Vector3 indexLocalPosition = new Vector3(currentX, -100f, 0f);
+
+    //         // Transform the local positions to world positions
+    //         Vector3 cubePosition = plane.transform.TransformPoint(cubeLocalPosition);
+    //         Vector3 indexPosition = plane.transform.TransformPoint(indexLocalPosition);
+
+    //         GameObject cube = Instantiate(cubePrefab, cubePosition, planeRotation, plane.transform); // Set plane as parent
+    //         GameObject index = Instantiate(indexPrefab, indexPosition, planeRotation, plane.transform); // Set plane as parent
+
+    //         currentX += spacing;
+
+    //         cubes[i] = cube;
+    //         indexes[i] = index;
+
+    //         // Set up cube and index UI
+    //         SetupCubeAndIndexUI(cube, index, numbers[i], i);
+    //     }
+
+    //     // Start sorting coroutine
+    //     StartCoroutine(BubbleSortCoroutine());
+    // }
 
     private void DestroyCubesAndIndexes()
     {
