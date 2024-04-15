@@ -79,7 +79,7 @@ public class SelectionSort : MonoBehaviour
         // Create a parent GameObject for the cubes
         GameObject proAnchor = new GameObject("proAnchor");
         Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-        GameObject cube = Instantiate(cubePrefab,cubePosition,Quaternion.identity);
+        GameObject cube1 = Instantiate(cubePrefab,cubePosition,Quaternion.identity);
         /*
         for (int i = 0; i < numbers.Length; i++)
         {
@@ -125,7 +125,7 @@ public class SelectionSort : MonoBehaviour
             }*/
         //}
 
-        StartCoroutine(SelectionSortCoroutine());
+        //StartCoroutine(SelectionSortCoroutine());
 
         // Focus camera on generated cubes
         //FocusCameraOnCubes();
