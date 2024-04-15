@@ -360,7 +360,7 @@ private void DisableText(TextMeshProUGUI textObject)
     private void VisualizePartition(int low, int high, int level)
     {
         List<GameObject> clonedCubes = new List<GameObject>();
-        float yOffset = -700f * (generatedCubes.Count - level);
+        float yOffset = -150f * (generatedCubes.Count - level);
 
         for (int i = 0; i < generatedCubes[level].Count; i++)
         {
