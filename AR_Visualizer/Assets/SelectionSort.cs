@@ -42,6 +42,7 @@ public class SelectionSort : MonoBehaviour
 
     public void GenerateCubes()
     {
+        inputCanvas.SetActive(false);
         if (sortingInProgress)
         {
             // If sorting is already in progress, ignore the button click
@@ -75,6 +76,11 @@ public class SelectionSort : MonoBehaviour
 
         cubes = new GameObject[numbers.Length]; // Initialize the array to store cube references
 
+        // Create a parent GameObject for the cubes
+        GameObject proAnchor = new GameObject("proAnchor");
+        Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+        GameObject cube = Instantiate(cubePrefab,cubePosition,Quaternion.identity);
+        /*
         for (int i = 0; i < numbers.Length; i++)
         {
             // Use the current position for each cube
@@ -84,8 +90,11 @@ public class SelectionSort : MonoBehaviour
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
+            // Set the cube as a child of the proAnchor GameObject
+            cube.transform.SetParent(proAnchor.transform);
+
             // Update currentX for the next cube
-            currentX += spacing * 2; // Double the spacing to ensure even spacing
+            currentX += spacing * 0.1f; // Double the spacing to ensure even spacing
 
             cubes[i] = cube; // Store reference to the cube in the array
 
@@ -113,16 +122,16 @@ public class SelectionSort : MonoBehaviour
             else
             {
                 Debug.LogError("Canvas component not found in the children of the cube prefab.");
-            }
-        }
+            }*/
+        //}
 
         StartCoroutine(SelectionSortCoroutine());
 
         // Focus camera on generated cubes
-        FocusCameraOnCubes();
+        //FocusCameraOnCubes();
 
         // Hide input canvas
-        inputCanvas.SetActive(false);
+        
     }
 
     private void FocusCameraOnCubes()

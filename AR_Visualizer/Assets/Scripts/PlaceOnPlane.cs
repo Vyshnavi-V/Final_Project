@@ -15,7 +15,6 @@ public class PlaceOnPlane : Singleton<PlaceOnPlane>
 {
     public Transform productAnchor = null;
     public bool placed;
-    public bool PlaneDetected { get; private set; }
 
     private static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
     private ARRaycastManager m_SessionOrigin;
@@ -33,13 +32,10 @@ public class PlaceOnPlane : Singleton<PlaceOnPlane>
 
     void Update()
     {
-        Transform productAnchor1 = GameObject.FindGameObjectWithTag("Machine_1").transform;
-        productAnchor = productAnchor1;
 
         // Update plane detection state
-        PlaneDetected = CheckPlaneDetection();
 
-        if (Input.touchCount == 0 || placed == true || !PlaneDetected)
+        if (Input.touchCount == 0 || placed == true )
         {
             return;
         }
@@ -65,18 +61,7 @@ public class PlaceOnPlane : Singleton<PlaceOnPlane>
         }
     }
 
-    bool CheckPlaneDetection()
-    {
-        var planeManager = this.GetComponent<ARPlaneManager>();
-        foreach (var plane in planeManager.trackables)
-        {
-            if (plane.gameObject.activeInHierarchy)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    
 
     public void DisablePlanes()
     {
