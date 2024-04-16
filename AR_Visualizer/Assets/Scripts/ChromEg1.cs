@@ -18,22 +18,22 @@ public class Chromatic : MonoBehaviour
 
         // Change color of sphere 2 to red and adjust text content
         yield return StartCoroutine(ChangeToColor(sphere2, Color.red));
-        UpdateText("No");
         SetTextProperties(sphere2.transform.position, textComponent);
+        UpdateText("X");
         yield return new WaitForSeconds(delayBetweenChanges);
 
         // Change color of sphere 2 to green and adjust text content
         yield return StartCoroutine(ChangeToColor(sphere2, Color.green));
-        UpdateText("Yes");
         SetTextProperties(sphere2.transform.position, textComponent);
+        UpdateText("√");
         yield return new WaitForSeconds(delayBetweenChanges);
 
         yield return StartCoroutine(ChangeToColor(sphere3, Color.red));
-        UpdateText("No");
+        UpdateText("X");
         SetTextProperties(sphere3.transform.position, textComponent);
         yield return new WaitForSeconds(delayBetweenChanges);
         yield return StartCoroutine(ChangeToColor(sphere3, Color.blue));
-        UpdateText("Yes");
+        UpdateText("√");
         SetTextProperties(sphere3.transform.position, textComponent);
     }
 
