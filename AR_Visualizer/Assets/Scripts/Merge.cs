@@ -52,7 +52,7 @@ public class Merge : MonoBehaviour
         string[] numbers = Nos.Split(',');
 
         float totalWidth = (numbers.Length - 1) * spacing;
-        float startX = -totalWidth / 2f;
+        float startX = -0.5f;
         float currentX = startX;
         float startY = 0f;
 
@@ -65,7 +65,7 @@ public class Merge : MonoBehaviour
             cubePositions[i] = cubePosition;
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
-            currentX += spacing * 2;
+            currentX += spacing * 0.05f;
 
             cubes[i] = cube;
 
@@ -132,7 +132,7 @@ public class Merge : MonoBehaviour
         {
             return;
         }
-        startY = startY - (spacing * 2);
+        startY = startY - (spacing * 0.05f);
         // Calculate the midpoint index
         int midpointIndex = startIndex + length / 2;
 
@@ -299,7 +299,7 @@ public class Merge : MonoBehaviour
     // Method to move a cube in a given direction
     private void MoveCube(GameObject cube, Vector3 direction)
     {
-        cube.transform.Translate(direction * spacing, Space.World); // Adjust spacing as needed
+        cube.transform.Translate(direction * 0.05f, Space.World); // Adjust spacing as needed
     }
 
     // Clear all division lines
@@ -323,16 +323,16 @@ public class Merge : MonoBehaviour
 
     private IEnumerator MergeCubesRecursive(List<GameObject> sortedCubes, int startIndex, GameObject[] leftHalf, GameObject[] rightHalf)
     {
-        yield return new WaitForSeconds(divisionDelay);
+        yield return new WaitForSeconds(sortingDelay);
         GameObject currentCube;
         GameObject nextCube;
+        GameObject firstcube;
 
         if (startIndex >= sortedCubes.Count - 1)
         {
             // All cubes are merged and sorted
             yield break;
         }
-        bool swapped = false;
 
         // Start comparing from the first index and compare each pair of adjacent elements only once
         int lastComparedIndex = startIndex - 1;
@@ -342,57 +342,69 @@ public class Merge : MonoBehaviour
 
             for (int i = startIndex; i < sortedCubes.Count - 2; i++)
             {
+                yield return new WaitForSeconds(sortingDelay);
                 if (i <= lastComparedIndex)
                     continue;
+                firstcube = sortedCubes[i];
                 currentCube = sortedCubes[i + 1];
                 nextCube = sortedCubes[i + 2];
                 bool left = Array.IndexOf(leftHalf, currentCube) != -1 && Array.IndexOf(leftHalf, nextCube) != -1;
 
-                // Only perform comparison and swap if cubes are from the same halves
+                // Only perform comparison and move if cubes are from the same halves
                 if (left)
                 {
                     // Highlight the cubes being compared
-                    HighlightCubes(currentCube, nextCube);
-
+                    
 
                     // Compare the values of cubes
                     int currentValue = int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
                     int nextValue = int.Parse(nextCube.GetComponentInChildren<TextMeshProUGUI>().text);
+                    infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
 
-                    // If the current value is greater than the next value, swap their positions
+                    // Determine the direction to move the cubes
+                    Vector3 currentCubeTargetPosition = currentCube.transform.position;
+                    Vector3 nextCubeTargetPosition = nextCube.transform.position;
+                    Vector3 firstCubeTargetPosition = firstcube.transform.position;
                     if (currentValue > nextValue)
                     {
-                        // Move the next cube next to the current cube
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
+                        HighlightCube(firstcube);
+                        firstCubeTargetPosition.y -= spacing*0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(firstcube, firstCubeTargetPosition));
+                        yield return new WaitForSeconds(divisionDelay);
+                        HighlightCubes(currentCube, nextCube);
+                        nextCubeTargetPosition.x -= spacing*0.05f;
+                        nextCubeTargetPosition.y -= spacing*0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
+                        
+                        currentCubeTargetPosition.x += spacing * 0.06f;
+                        currentCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
 
-                        // Swap cubes in the sorted list
-                        sortedCubes[i + 1] = nextCube;
-                        sortedCubes[i + 2] = currentCube;
-
-                        // Update leftHalfList with swapped cubes
+                        // Update the position in leftHalf list
                         int currentCubeIndex = Array.IndexOf(leftHalf, currentCube);
                         int nextCubeIndex = Array.IndexOf(leftHalf, nextCube);
                         leftHalf[currentCubeIndex] = nextCube;
                         leftHalf[nextCubeIndex] = currentCube;
-
-                        // Visualize the swapping operation
-                        yield return StartCoroutine(SmoothSwapCubePositions(currentCube, nextCube));
-                        swapped = true;
                     }
                     else
                     {
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
-                        yield return StartCoroutine(SmoothMoveCube(nextCube, newPosition));
+                        // If no swapping, just move the cubes down
+                        currentCubeTargetPosition.y -= spacing*0.05f;
+                        nextCubeTargetPosition.x -= spacing * 0.03f;
+                        nextCubeTargetPosition.y -= spacing*0.05f;
+                        firstCubeTargetPosition.y -= spacing*0.05f;
+                        HighlightCube(firstcube);
+                        yield return StartCoroutine(SmoothMoveCube(firstcube,firstCubeTargetPosition));
                         yield return new WaitForSeconds(divisionDelay);
+                        HighlightCubes(currentCube, nextCube);
+
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
                     }
 
+                    // Reset the color of the cubes after comparison
                     ResetCubeTextColor(currentCube);
                     ResetCubeTextColor(nextCube);
-                    // Reset the color of the cubes after comparison
 
                     // Update the last compared index
                     lastComparedIndex = i + 1;
@@ -404,6 +416,7 @@ public class Merge : MonoBehaviour
             // Compare adjacent pairs of cubes from the same halves and merge if necessary
             for (int i = startIndex; i < sortedCubes.Count - 1; i++)
             {
+                yield return new WaitForSeconds(sortingDelay);
                 // Skip if the current index was already compared in the previous iteration
                 if (i <= lastComparedIndex)
                     continue;
@@ -411,55 +424,65 @@ public class Merge : MonoBehaviour
                 currentCube = sortedCubes[i];
                 nextCube = sortedCubes[i + 1];
 
-
                 // Determine if the cubes are from the same halves
                 bool left = Array.IndexOf(leftHalf, currentCube) != -1 && Array.IndexOf(leftHalf, nextCube) != -1;
 
-                // Only perform comparison and swap if cubes are from the same halves
+                // Only perform comparison and move if cubes are from the same halves
                 if (left)
                 {
                     // Highlight the cubes being compared
                     HighlightCubes(currentCube, nextCube);
 
-
                     // Compare the values of cubes
+                    
                     int currentValue = int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
+                    Debug.Log("Current" + " " + currentValue + "i" + " " + i);
                     int nextValue = int.Parse(nextCube.GetComponentInChildren<TextMeshProUGUI>().text);
+                    infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
 
-                    // If the current value is greater than the next value, swap their positions
+                    // Determine the direction to move the cubes
+                    Vector3 currentCubeTargetPosition = currentCube.transform.position;
+                    Vector3 nextCubeTargetPosition = nextCube.transform.position;
+
                     if (currentValue > nextValue)
                     {
-                        // Move the next cube next to the current cube
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
+                        HighlightCubes(currentCube, nextCube);
+                        if(i==0)
+                        nextCubeTargetPosition.x -= spacing * 0.06f;
+                        else
+                        nextCubeTargetPosition.x -= spacing * 0.04f;
+                        nextCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
 
-                        // Swap cubes in the sorted list
-                        sortedCubes[i] = nextCube;
-                        sortedCubes[i + 1] = currentCube;
+                        currentCubeTargetPosition.x += spacing * 0.07f;
+                        currentCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
 
-                        // Update leftHalfList with swapped cubes
+                        // Update the position in leftHalf list
                         int currentCubeIndex = Array.IndexOf(leftHalf, currentCube);
                         int nextCubeIndex = Array.IndexOf(leftHalf, nextCube);
                         leftHalf[currentCubeIndex] = nextCube;
                         leftHalf[nextCubeIndex] = currentCube;
-
-                        // Visualize the swapping operation
-                        yield return StartCoroutine(SmoothSwapCubePositions(currentCube, nextCube));
-                        swapped = true;
                     }
                     else
                     {
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
-                        yield return StartCoroutine(SmoothMoveCube(nextCube, newPosition));
+                        // If no swapping, just move the cubes down
+                        currentCubeTargetPosition.y -= spacing*0.05f;
+                        if(i==0)
+                        nextCubeTargetPosition.x -= spacing * 0.05f;
+                        else
+                        nextCubeTargetPosition.x -= spacing * 0.03f;
+                        nextCubeTargetPosition.y -= spacing * 0.05f;
                         yield return new WaitForSeconds(divisionDelay);
+                        HighlightCubes(currentCube, nextCube);
+
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
                     }
 
+                    // Reset the color of the cubes after comparison
                     ResetCubeTextColor(currentCube);
                     ResetCubeTextColor(nextCube);
-                    // Reset the color of the cubes after comparison
 
                     // Update the last compared index
                     lastComparedIndex = i + 1;
@@ -484,17 +507,15 @@ public class Merge : MonoBehaviour
         }
 
         yield return StartCoroutine(MergeSortedHalves(sortedAndGroupedLeft, sortedAndGroupedRight, finalSorted));
-
-
-
-
     }
+
 
     private IEnumerator MergeRightHalf(List<GameObject> sortedCubes, int startIndex, GameObject[] rightHalf)
     {
-        yield return new WaitForSeconds(divisionDelay);
+        yield return new WaitForSeconds(sortingDelay);
         GameObject currentCube;
         GameObject nextCube;
+        GameObject firstCube;
 
         if (startIndex >= sortedCubes.Count - 1)
         {
@@ -511,12 +532,14 @@ public class Merge : MonoBehaviour
             Debug.Log("Length:" + rightHalf.Length);
             for (int i = startIndex; i < sortedCubes.Count - 2; i++)
             {
+                yield return new WaitForSeconds(sortingDelay);
                 // Skip if the current index was already compared in the previous iteration
                 if (i <= lastComparedIndex)
                     continue;
 
                 currentCube = sortedCubes[i + 1];
                 nextCube = sortedCubes[i + 2];
+                firstCube = sortedCubes[i];
 
                 // Determine if the cubes are from the same halves
                 bool right = Array.IndexOf(rightHalf, currentCube) != -1 && Array.IndexOf(rightHalf, nextCube) != -1;
@@ -524,40 +547,50 @@ public class Merge : MonoBehaviour
                 // Only perform comparison and swap if cubes are from the same halves
                 if (right)
                 {
-                    // Highlight the cubes being compared
-                    HighlightCubes(currentCube, nextCube);
-
-                    // Compare the values of cubes
                     int currentValue = int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
                     int nextValue = int.Parse(nextCube.GetComponentInChildren<TextMeshProUGUI>().text);
+                    infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
+
+                    // Determine the direction to move the cubes
+                    Vector3 currentCubeTargetPosition = currentCube.transform.position;
+                    Vector3 nextCubeTargetPosition = nextCube.transform.position;
+                    Vector3 firstCubeTargetPosition = firstCube.transform.position;
 
                     // If the current value is greater than the next value, swap their positions
                     if (currentValue > nextValue)
                     {
-                        // Move the next cube next to the current cube
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
+                        HighlightCube(firstCube);
+                        firstCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(firstCube, firstCubeTargetPosition));
+                        yield return new WaitForSeconds(divisionDelay);
+                        HighlightCubes(currentCube, nextCube);
+                        nextCubeTargetPosition.x -= spacing * 0.05f;
+                        nextCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
 
-                        // Swap cubes in the sorted list
-                        sortedCubes[i + 1] = nextCube;
-                        sortedCubes[i + 2] = currentCube;
+                        currentCubeTargetPosition.x += spacing * 0.06f;
+                        currentCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
+
+                        // Update the position in leftHalf list
                         int currentCubeIndex = Array.IndexOf(rightHalf, currentCube);
                         int nextCubeIndex = Array.IndexOf(rightHalf, nextCube);
                         rightHalf[currentCubeIndex] = nextCube;
                         rightHalf[nextCubeIndex] = currentCube;
-
-                        // Visualize the swapping operation
-                        yield return StartCoroutine(SmoothSwapCubePositions(currentCube, nextCube));
-                        swapped = true;
                     }
                     else
                     {
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
-                        yield return StartCoroutine(SmoothMoveCube(nextCube, newPosition));
+                        currentCubeTargetPosition.y -= spacing * 0.05f;
+                        nextCubeTargetPosition.x -= spacing * 0.02f;
+                        nextCubeTargetPosition.y -= spacing * 0.05f;
+                        firstCubeTargetPosition.y -= spacing * 0.05f;
+                        HighlightCube(firstCube);
+                        yield return StartCoroutine(SmoothMoveCube(firstCube, firstCubeTargetPosition));
                         yield return new WaitForSeconds(divisionDelay);
+                        HighlightCubes(currentCube, nextCube);
+
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
                     }
 
                     ResetCubeTextColor(currentCube);
@@ -574,6 +607,7 @@ public class Merge : MonoBehaviour
             // Compare adjacent pairs of cubes from the same halves and merge if necessary
             for (int i = startIndex; i < sortedCubes.Count - 1; i++)
             {
+                yield return new WaitForSeconds(sortingDelay);
                 // Skip if the current index was already compared in the previous iteration
                 if (i <= lastComparedIndex)
                     continue;
@@ -590,36 +624,49 @@ public class Merge : MonoBehaviour
                     // Highlight the cubes being compared
                     HighlightCubes(currentCube, nextCube);
 
-                    // Compare the values of cubes
                     int currentValue = int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
+                    Debug.Log("Current" + " " + currentValue + "i" + " " + i);
                     int nextValue = int.Parse(nextCube.GetComponentInChildren<TextMeshProUGUI>().text);
+                    infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
+
+                    // Determine the direction to move the cubes
+                    Vector3 currentCubeTargetPosition = currentCube.transform.position;
+                    Vector3 nextCubeTargetPosition = nextCube.transform.position;
 
                     // If the current value is greater than the next value, swap their positions
                     if (currentValue > nextValue)
                     {
-                        // Move the next cube next to the current cube
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
+                        HighlightCubes(currentCube, nextCube);
+                        if(i==4)
+                        nextCubeTargetPosition.x -= spacing * 0.04f;
+                        else
+                        nextCubeTargetPosition.x -= spacing * 0.04f;
+                        nextCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
 
-                        // Swap cubes in the sorted list
-                        sortedCubes[i] = nextCube;
-                        sortedCubes[i + 1] = currentCube;
+                        currentCubeTargetPosition.x += spacing * 0.07f;
+                        currentCubeTargetPosition.y -= spacing * 0.05f;
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
+
+                        // Update the position in leftHalf list
                         int currentCubeIndex = Array.IndexOf(rightHalf, currentCube);
                         int nextCubeIndex = Array.IndexOf(rightHalf, nextCube);
                         rightHalf[currentCubeIndex] = nextCube;
                         rightHalf[nextCubeIndex] = currentCube;
-                        // Visualize the swapping operation
-                        yield return StartCoroutine(SmoothSwapCubePositions(currentCube, nextCube));
-                        swapped = true;
                     }
                     else
                     {
-                        Vector3 newPosition = currentCube.transform.position;
-                        newPosition.x += spacing * 2;
-                        nextCube.transform.position = newPosition;
-                        yield return StartCoroutine(SmoothMoveCube(nextCube, newPosition));
+                        currentCubeTargetPosition.y -= spacing * 0.05f;
+                        if (i == 4)
+                            nextCubeTargetPosition.x -= spacing * 0.05f;
+                        else
+                            nextCubeTargetPosition.x -= spacing * 0.03f;
+                        nextCubeTargetPosition.y -= spacing * 0.05f;
                         yield return new WaitForSeconds(divisionDelay);
+                        HighlightCubes(currentCube, nextCube);
+
+                        yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
+                        yield return StartCoroutine(SmoothMoveCube(nextCube, nextCubeTargetPosition));
                     }
 
                     ResetCubeTextColor(currentCube);
@@ -640,6 +687,10 @@ public class Merge : MonoBehaviour
 
     private IEnumerator GroupPairs(List<GameObject> sortedCubes, int startIndex, List<GameObject> sortedAndGrouped)
     {
+        yield return new WaitForSeconds(sortingDelay);
+        float small = 0.05f;
+        float large = 0.07f;
+
         if (startIndex + 3 < sortedCubes.Count)
         {
             GameObject cube1 = sortedCubes[startIndex];
@@ -655,8 +706,8 @@ public class Merge : MonoBehaviour
             Debug.Log(value1Cube1 + " " + value2Cube2 + " " + value1Cube3 + " " + value2Cube4);
             Vector3 cube1Position = cube1.transform.position;
             Vector3 cube2Position = cube2.transform.position;
-            Vector3 cube3Position = cube2.transform.position + Vector3.right * spacing * 2;
-            Vector3 cube4Position = cube3Position + Vector3.right * spacing * 2;
+            Vector3 cube3Position = cube2.transform.position + Vector3.right * 4f * small;
+            Vector3 cube4Position = cube3Position + Vector3.right * 4f * small;
 
 
             yield return new WaitForSeconds(sortingDelay);
@@ -667,7 +718,7 @@ public class Merge : MonoBehaviour
                 sortedAndGrouped.Add(cube3);
                 j++;
                 HighlightCubes(cube1, cube3);
-                Vector3 newPosition = cube1Position - Vector3.up * 3 * spacing;
+                Vector3 newPosition = cube1Position - Vector3.up * large* spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube3, cube3.transform.position, newPosition));
                 ResetCubeTextColor(cube1);
                 ResetCubeTextColor(cube3);
@@ -678,7 +729,7 @@ public class Merge : MonoBehaviour
                 sortedAndGrouped.Add(cube1);
                 i++;
                 HighlightCubes(cube1, cube3);
-                Vector3 newPosition = cube1Position - Vector3.up * 3 * spacing;
+                Vector3 newPosition = cube1Position - Vector3.up *large* spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, newPosition));
                 ResetCubeTextColor(cube1);
                 ResetCubeTextColor(cube3);
@@ -691,14 +742,14 @@ public class Merge : MonoBehaviour
                 {
                     sortedAndGrouped.Add(cube3);
                     j++;
-                    Vector3 newPosition = cube2Position - Vector3.up * 3 * spacing;
+                    Vector3 newPosition = cube2Position - Vector3.up * large * spacing;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube3, cube3.transform.position, newPosition));
                 }
                 else
                 {
                     sortedAndGrouped.Add(cube2);
                     i++;
-                    Vector3 newPosition = cube2Position - Vector3.up * 3 * spacing;
+                    Vector3 newPosition = cube2Position - Vector3.up * large* spacing;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, newPosition));
                 }
                 ResetCubeTextColor(cube2);
@@ -711,14 +762,14 @@ public class Merge : MonoBehaviour
                 {
                     sortedAndGrouped.Add(cube4);
                     j++;
-                    Vector3 newPosition = cube2Position - Vector3.up * 3 * spacing;
+                    Vector3 newPosition = cube2Position - Vector3.up * large* spacing;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube4, cube4.transform.position, newPosition));
                 }
                 else
                 {
                     sortedAndGrouped.Add(cube1);
                     i++;
-                    Vector3 newPosition = cube2Position - Vector3.up * 3 * spacing;
+                    Vector3 newPosition = cube2Position - Vector3.up * large * spacing;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, newPosition));
                 }
                 ResetCubeTextColor(cube1);
@@ -731,8 +782,8 @@ public class Merge : MonoBehaviour
                 {
                     sortedAndGrouped.Add(cube4);
                     j++;
-                    Vector3 cube2new = cube4Position - Vector3.up * 3 * spacing;
-                    Vector3 cube4new = cube3Position - Vector3.up * 3 * spacing;
+                    Vector3 cube2new = cube4Position - Vector3.up * large * spacing;
+                    Vector3 cube4new = cube3Position - Vector3.up * large * spacing;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube4, cube4.transform.position, cube4new));
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube2new));
 
@@ -741,8 +792,8 @@ public class Merge : MonoBehaviour
                 {
                     i++;
                     sortedAndGrouped.Add(cube2);
-                    Vector3 cube2new = cube3Position - Vector3.up * 3 * spacing;
-                    Vector3 cube4new = cube4Position - Vector3.up * 3 * spacing;
+                    Vector3 cube2new = cube3Position - Vector3.up * large * spacing;
+                    Vector3 cube4new = cube4Position - Vector3.up * large * spacing;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube2new));
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube4, cube4.transform.position, cube4new));
 
@@ -754,21 +805,21 @@ public class Merge : MonoBehaviour
             if (i == 2 && j == 1)
             {
                 sortedAndGrouped.Add(cube4);
-                Vector3 cube4new = cube4Position - Vector3.up * 3 * spacing;
+                Vector3 cube4new = cube4Position - Vector3.up * large * spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube4, cube4.transform.position, cube4new));
             }
             else if (j == 2 && i == 1)
             {
                 sortedAndGrouped.Add(cube2);
-                Vector3 cube4new = cube4Position - Vector3.up * 3 * spacing;
+                Vector3 cube4new = cube4Position - Vector3.up * large* spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube4new));
             }
             else if (j == 2)
             {
                 sortedAndGrouped.Add(cube1);
                 sortedAndGrouped.Add(cube2);
-                Vector3 cube1new = cube3Position - Vector3.up * 3 * spacing;
-                Vector3 cube2new = cube4Position - Vector3.up * 3 * spacing;
+                Vector3 cube1new = cube3Position - Vector3.up * large* spacing;
+                Vector3 cube2new = cube4Position - Vector3.up * large * spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube2new));
                 ResetCubeTextColor(cube1);
@@ -778,8 +829,8 @@ public class Merge : MonoBehaviour
             {
                 sortedAndGrouped.Add(cube3);
                 sortedAndGrouped.Add(cube4);
-                Vector3 cube3new = cube3Position - Vector3.up * 3 * spacing;
-                Vector3 cube4new = cube4Position - Vector3.up * 3 * spacing;
+                Vector3 cube3new = cube3Position - Vector3.up * large * spacing;
+                Vector3 cube4new = cube4Position - Vector3.up * large * spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube3, cube3.transform.position, cube3new));
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube4, cube4.transform.position, cube4new));
                 ResetCubeTextColor(cube3);
@@ -803,8 +854,8 @@ public class Merge : MonoBehaviour
 
             Debug.Log(value1Cube1 + " " + value2Cube2 + " " + value1Cube3);
             Vector3 cube1Position = cube1.transform.position;
-            Vector3 cube2Position = cube1.transform.position + Vector3.right * spacing * 2;
-            Vector3 cube3Position = cube2Position + Vector3.right * spacing * 2;
+            Vector3 cube2Position = cube1.transform.position + Vector3.right * 4f * small;
+            Vector3 cube3Position = cube2Position + Vector3.right * 4f * small;
 
 
             int j = 0, i = 0;
@@ -813,7 +864,7 @@ public class Merge : MonoBehaviour
                 sortedAndGrouped.Add(cube2);
                 j++;
                 HighlightCubes(cube1, cube2);
-                Vector3 cube2new = cube1Position - Vector3.up * spacing * 2;
+                Vector3 cube2new = cube1Position - Vector3.up * spacing * small;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube2new));
                 ResetCubeTextColor(cube1);
                 ResetCubeTextColor(cube2);
@@ -824,7 +875,7 @@ public class Merge : MonoBehaviour
                 sortedAndGrouped.Add(cube1);
                 i++;
                 HighlightCubes(cube1, cube2);
-                Vector3 cube1new = cube1Position - Vector3.up * spacing * 2;
+                Vector3 cube1new = cube1Position - Vector3.up * spacing * small;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
                 ResetCubeTextColor(cube1);
                 ResetCubeTextColor(cube2);
@@ -836,7 +887,7 @@ public class Merge : MonoBehaviour
                     sortedAndGrouped.Add(cube3);
                     j++;
                     HighlightCubes(cube1, cube3);
-                    Vector3 cube3new = cube2Position - Vector3.up * spacing * 2;
+                    Vector3 cube3new = cube2Position - Vector3.up * spacing * small;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube3, cube3.transform.position, cube3new));
                     ResetCubeTextColor(cube1);
                     ResetCubeTextColor(cube3);
@@ -847,7 +898,7 @@ public class Merge : MonoBehaviour
                     sortedAndGrouped.Add(cube1);
                     i++;
                     HighlightCubes(cube1, cube3);
-                    Vector3 cube1new = cube2Position - Vector3.up * spacing * 2;
+                    Vector3 cube1new = cube2Position - Vector3.up * spacing * small;
                     yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
                     ResetCubeTextColor(cube1);
                     ResetCubeTextColor(cube3);
@@ -858,8 +909,8 @@ public class Merge : MonoBehaviour
                 sortedAndGrouped.Add(cube2);
                 sortedAndGrouped.Add(cube3);
                 HighlightCubes(cube2, cube3);
-                Vector3 cube2new = cube2Position - Vector3.up * spacing * 2;
-                Vector3 cube3new = cube3Position - Vector3.up * spacing * 2;
+                Vector3 cube2new = cube2Position - Vector3.up * spacing * small;
+                Vector3 cube3new = cube3Position - Vector3.up * spacing * small;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube2new));
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube3, cube3.transform.position, cube3new));
                 ResetCubeTextColor(cube2);
@@ -868,13 +919,13 @@ public class Merge : MonoBehaviour
             if (j == 2)
             {
                 sortedAndGrouped.Add(cube1);
-                Vector3 cube1new = cube3Position - Vector3.up * 2 * spacing;
+                Vector3 cube1new = cube3Position - Vector3.up * small * spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
             }
             else if (i == 1 && j == 1)
             {
                 sortedAndGrouped.Add(cube3);
-                Vector3 cube3new = cube3Position - Vector3.up * 2 * spacing;
+                Vector3 cube3new = cube3Position - Vector3.up * small * spacing;
                 yield return StartCoroutine(SmoothMoveCubeGroups(cube3, cube3.transform.position, cube3new));
             }
             // Reset cube colors
@@ -885,11 +936,11 @@ public class Merge : MonoBehaviour
             GameObject cube1 = sortedCubes[startIndex];
             GameObject cube2 = sortedCubes[startIndex + 1];
             Vector3 cube1Position = cube1.transform.position;
-            Vector3 cube2Position = cube1.transform.position + Vector3.right * spacing * 2;
+            Vector3 cube2Position = cube1.transform.position + Vector3.right * 4f * small;
             sortedAndGrouped.Add(cube1);
             sortedAndGrouped.Add(cube2);
-            Vector3 cube1new = cube1Position - Vector3.up * spacing * 2;
-            Vector3 cube2new = cube2Position - Vector3.up * spacing * 2;
+            Vector3 cube1new = cube1Position - Vector3.up * spacing * small;
+            Vector3 cube2new = cube2Position - Vector3.up * spacing * small;
             yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
             yield return StartCoroutine(SmoothMoveCubeGroups(cube2, cube2.transform.position, cube2new));
         }
@@ -898,7 +949,7 @@ public class Merge : MonoBehaviour
             GameObject cube1 = sortedCubes[startIndex];
             Vector3 cube1Position = cube1.transform.position;
             sortedAndGrouped.Add(cube1);
-            Vector3 cube1new = cube1Position - Vector3.up * spacing * 2;
+            Vector3 cube1new = cube1Position - Vector3.up * spacing * small;
             yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
 
 
@@ -923,7 +974,7 @@ public class Merge : MonoBehaviour
 
         int leftIndex = 0;
         int rightIndex = 0;
-        float yOffset = -3 * spacing; // Adjust this value as needed for the desired spacing between rows
+        float yOffset = -0.07f * spacing; // Adjust this value as needed for the desired spacing between rows
 
         // Get the position of the first cube and calculate the initial position for arranging cubes in a horizontal line
         Vector3 newPosition = sortedAndGroupedLeft[0].transform.position;
@@ -966,7 +1017,7 @@ public class Merge : MonoBehaviour
             ResetCubeTextColor(leftCube);
             ResetCubeTextColor(rightCube);
             // Increment the horizontal position for the next cube
-            horizontalPosition += 2 * spacing;
+            horizontalPosition += 0.05f * 2f;
         }
 
         // Add remaining cubes from left half, if any
@@ -982,7 +1033,7 @@ public class Merge : MonoBehaviour
             yield return StartCoroutine(SmoothMoveCubeGroups(leftCube, leftCube.transform.position, leftCubeNewPosition));
 
             // Increment the horizontal position for the next cube
-            horizontalPosition += 2 * spacing;
+            horizontalPosition += 0.1f * spacing;
         }
 
         // Add remaining cubes from right half, if any
@@ -998,7 +1049,7 @@ public class Merge : MonoBehaviour
             yield return StartCoroutine(SmoothMoveCubeGroups(rightCube, rightCube.transform.position, rightCubeNewPosition));
 
             // Increment the horizontal position for the next cube
-            horizontalPosition += 2 * spacing;
+            horizontalPosition += 0.05f * spacing;
         }
         Debug.Log("Right" + rightIndex);
         Debug.Log("Left" + leftIndex);
@@ -1011,11 +1062,18 @@ public class Merge : MonoBehaviour
 
 
 
+    private void HighlightCube(GameObject cube)
+    {
+        TextMeshProUGUI text = cube.GetComponentInChildren<TextMeshProUGUI>();
+
+        if (text!= null)
+            text.color = comparisonColor;
+    }
 
     private IEnumerator SmoothMoveCubeGroups(GameObject cube, Vector3 startPosition, Vector3 targetPosition)
     {
         float distance = Vector3.Distance(startPosition, targetPosition);
-        float duration = distance / (swapSpeed * 2 * 4);
+        float duration = distance / (swapSpeed * 0.05f);
 
         float elapsedTime = 0f;
         while (elapsedTime < duration)
@@ -1033,7 +1091,8 @@ public class Merge : MonoBehaviour
     {
         Vector3 startPosition = cube.transform.position;
         float distance = Vector3.Distance(startPosition, targetPosition);
-        float duration = distance / swapSpeed; // Adjust duration based on distance and speed
+        Debug.Log("Distane"+distance);
+        float duration = distance / swapSpeed*0.1f; // Adjust duration based on distance and speed
 
         float elapsedTime = 0f;
         while (elapsedTime < duration)
