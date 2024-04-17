@@ -1201,3 +1201,63 @@ public class Merge : MonoBehaviour
     }
 
 }
+ // public void CreateArray()
+    // {
+    //     string[] entries = entriesInputField.text.Split(','); // Split the input string by commas
+
+    //     // Check if the number of entries matches the size of the array
+    //     int arraySize = entries.Length;
+    //     if (arraySize <= 0)
+    //     {
+    //         Debug.LogError("Array size must be a positive integer.");
+    //         return;
+    //     }
+
+    //     // Clean up previously generated cubes
+    //     DestroyCubes();
+
+    //     // Calculate total width
+    //     float totalWidth = (arraySize - 1) * spacing;
+
+    //     // Calculate starting position
+    //     float startX = -totalWidth / 2f;
+
+    //     // Initialize currentX to starting position
+    //     float currentX = startX;
+
+    //     for (int i = 0; i < arraySize; i++)
+    //     {
+    //         // Use the current position for each cube
+    //         Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+
+    //         GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+    //         cubes.Add(cube);
+
+    //         // Update currentX for the next cube
+    //         currentX += spacing;
+
+    //         // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
+    //         TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
+    //         if (textMesh != null)
+    //         {
+    //             textMesh.text = entries[i].Trim(); // Assign the entry value to the cube
+    //         }
+    //         else
+    //         {
+    //             Debug.LogError("TextMeshProUGUI component not found in the children of the cube prefab.");
+    //         }
+    //     }
+    //     PositionInsertDeleteCanvas();
+
+    //     // Hide input canvas
+    //     //inputCanvas.SetActive(false);
+
+    //     // Hide insertion canvas
+    //     //insertionCanvas.SetActive(false);
+
+    //     // Focus camera on generated cubes
+    //    // FocusCameraOnCubes();
+    // }
+
+
+    
