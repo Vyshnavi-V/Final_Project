@@ -6,9 +6,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEngine.XR.ARFoundation;
 
 public class Merge : MonoBehaviour
 {
+    public ARPlaneManager arPlaneManager;
     public GameObject cubePrefab;
     public TMP_InputField inputField;
     public float spacing = 2f;
@@ -19,7 +21,10 @@ public class Merge : MonoBehaviour
     public GameObject linePrefab;
     public float divisionDelay = 2f; // Delay between each division
     public Material lineMaterial; // Material for the line renderer
+    public TextMeshProUGUI infotext;
     public TextMeshProUGUI infoText;
+
+
 
     private GameObject[] cubes;
     List<GameObject> sortedAndGroupedLeft = new List<GameObject>();
@@ -36,7 +41,46 @@ public class Merge : MonoBehaviour
         // Add a button or event listener here to call GenerateCubes()
     }
 
-    public void GenerateCubes()
+ public void OnSubmitButtonClick()
+    {
+
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
+
+    private IEnumerator WaitForPlaneDetection()
+    {
+
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
+        {
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
+            {
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    Debug.LogError("No AR planes detected .");
+                    yield return new WaitForSeconds(2f);
+                    // Plane detected, generate cubes on this plane
+                    GenerateCubesOnPlane(arPlane);
+                    yield break; // Exit the coroutine
+                }
+            }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+        }
+
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
+        public void GenerateCubesOnPlane(ARPlane plane)
     {
         if (cubes != null)
         {
@@ -58,14 +102,17 @@ public class Merge : MonoBehaviour
 
         cubes = new GameObject[numbers.Length];
         Vector3[] cubePositions = new Vector3[numbers.Length];
+        Vector3 planePosition = plane.transform.position;
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            Vector3 cubePosition = new Vector3(currentX, startY, 0f);
+            Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
             cubePositions[i] = cubePosition;
-
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
-            currentX += spacing * 0.05f;
+
+            infotext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
+
+            currentX += spacing *0.05f;
 
             cubes[i] = cube;
 
@@ -101,7 +148,7 @@ public class Merge : MonoBehaviour
         GameObject[] leftHalf = cubes.Take(midpointIndex).ToArray();
         GameObject[] rightHalf = cubes.Skip(midpointIndex).ToArray();
         divisionPositions.Add(cubePositions);
-
+        infotext.text = "Divide Cheyan Povane";
         // Start recursive division with delay
         StartCoroutine(DivideCubesWithDelay(cubes));
     }
@@ -447,6 +494,7 @@ public class Merge : MonoBehaviour
                     if (currentValue > nextValue)
                     {
                         HighlightCubes(currentCube, nextCube);
+                    
                         if(i==0)
                         nextCubeTargetPosition.x -= spacing * 0.06f;
                         else
@@ -522,7 +570,6 @@ public class Merge : MonoBehaviour
             // All cubes are merged and sorted
             yield break;
         }
-        bool swapped = false;
 
         // Start comparing from the first index and compare each pair of adjacent elements only once
         int lastComparedIndex = startIndex - 1;
@@ -623,6 +670,7 @@ public class Merge : MonoBehaviour
                 {
                     // Highlight the cubes being compared
                     HighlightCubes(currentCube, nextCube);
+                    int size = cubes.Length;
 
                     int currentValue = int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
                     Debug.Log("Current" + " " + currentValue + "i" + " " + i);
@@ -637,8 +685,9 @@ public class Merge : MonoBehaviour
                     if (currentValue > nextValue)
                     {
                         HighlightCubes(currentCube, nextCube);
-                        if(i==4)
-                        nextCubeTargetPosition.x -= spacing * 0.04f;
+
+                        if((size==7 && i==3)||i==4)
+                        nextCubeTargetPosition.x -= spacing * 0.06f;
                         else
                         nextCubeTargetPosition.x -= spacing * 0.04f;
                         nextCubeTargetPosition.y -= spacing * 0.05f;
@@ -657,7 +706,7 @@ public class Merge : MonoBehaviour
                     else
                     {
                         currentCubeTargetPosition.y -= spacing * 0.05f;
-                        if (i == 4)
+                        if ((size==7 && i==3)||i == 4)
                             nextCubeTargetPosition.x -= spacing * 0.05f;
                         else
                             nextCubeTargetPosition.x -= spacing * 0.03f;
@@ -1017,7 +1066,7 @@ public class Merge : MonoBehaviour
             ResetCubeTextColor(leftCube);
             ResetCubeTextColor(rightCube);
             // Increment the horizontal position for the next cube
-            horizontalPosition += 0.05f * 2f;
+            horizontalPosition += 0.2f;
         }
 
         // Add remaining cubes from left half, if any
@@ -1033,7 +1082,7 @@ public class Merge : MonoBehaviour
             yield return StartCoroutine(SmoothMoveCubeGroups(leftCube, leftCube.transform.position, leftCubeNewPosition));
 
             // Increment the horizontal position for the next cube
-            horizontalPosition += 0.1f * spacing;
+            horizontalPosition += 0.2f;
         }
 
         // Add remaining cubes from right half, if any
@@ -1049,7 +1098,7 @@ public class Merge : MonoBehaviour
             yield return StartCoroutine(SmoothMoveCubeGroups(rightCube, rightCube.transform.position, rightCubeNewPosition));
 
             // Increment the horizontal position for the next cube
-            horizontalPosition += 0.05f * spacing;
+            horizontalPosition += 0.2f;
         }
         Debug.Log("Right" + rightIndex);
         Debug.Log("Left" + leftIndex);

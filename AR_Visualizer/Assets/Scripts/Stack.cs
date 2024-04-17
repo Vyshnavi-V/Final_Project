@@ -26,9 +26,9 @@ public class Stack : MonoBehaviour
     private void Start()
     {
         cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.y; // Get the size of the cube
-        boxCanvasRect = GameObject.FindGameObjectWithTag("BoxCanvas").GetComponent<RectTransform>(); // Find BoxCanvas by tag
+        //boxCanvasRect = GameObject.FindGameObjectWithTag("BoxCanvas").GetComponent<RectTransform>(); // Find BoxCanvas by tag
 
-        GenerateBox(); // Generate and position the box
+        //GenerateBox(); // Generate and position the box
     }
 
     // Method to generate and position the box
