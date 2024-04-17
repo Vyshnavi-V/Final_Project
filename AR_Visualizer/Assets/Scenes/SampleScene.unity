@@ -31016,7 +31016,7 @@ MonoBehaviour:
   orderCanvas: {fileID: 591693285}
   cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
     type: 3}
-  cubeDelay: 0.5
+  cubeDelay: 1
   squareDelayBetweenChanges: 1.7
   sphereDelayBetweenChanges: 1.7
   popDelay: 2.5

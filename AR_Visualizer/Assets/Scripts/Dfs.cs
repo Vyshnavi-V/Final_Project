@@ -38,9 +38,11 @@ public class Dfs : MonoBehaviour
         }
 
         orderText = orderCanvas.GetComponentInChildren<TextMeshProUGUI>();
+        
 
         StartCoroutine(ChangeSquareColors());
         StartCoroutine(ChangeSphereColors());
+        StartCoroutine(PushPopOperations());
 
         cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.x;
     }
