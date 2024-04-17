@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,9 +38,11 @@ public class Dfs : MonoBehaviour
         }
 
         orderText = orderCanvas.GetComponentInChildren<TextMeshProUGUI>();
+        
 
         StartCoroutine(ChangeSquareColors());
         StartCoroutine(ChangeSphereColors());
+        StartCoroutine(PushPopOperations());
 
         cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.x;
     }
@@ -49,7 +52,7 @@ public class Dfs : MonoBehaviour
         foreach (Transform square in squares)
         {
             string squareName = square.name;
-            if (squareName != "Line 11" && squareName != "Line 12")
+            if (squareName != "Line 2" && squareName != "Line 8")
             {
                 square.GetComponent<Renderer>().material.color = Color.green; 
             }
@@ -229,7 +232,7 @@ public class Dfs : MonoBehaviour
     private IEnumerator MoveAndDestroyCubeCoroutine(GameObject cube)
     {
         Vector3 initialPosition = cube.transform.position;
-        Vector3 finalPosition = initialPosition + Vector3.down * 20f;
+        Vector3 finalPosition = initialPosition + Vector3.up * 20f;
         float duration = 1.2f; // Duration of the movement
         float elapsedTime = 0f;
 
