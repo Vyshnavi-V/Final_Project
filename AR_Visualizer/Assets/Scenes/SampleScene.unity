@@ -21109,7 +21109,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &569109647
 RectTransform:
   m_ObjectHideFlags: 0
@@ -24105,7 +24105,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &649440075
 RectTransform:
   m_ObjectHideFlags: 0
@@ -28222,8 +28222,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 26
+  m_fontSizeBase: 26
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -28258,7 +28258,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 180.63199, w: 21.300053}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -30495,7 +30495,7 @@ MonoBehaviour:
     type: 3}
   userInputField: {fileID: 892103994}
   submitButton: {fileID: 1771107280}
-  spacing: 8
+  spacing: 0.4
   textColor: {r: 1, g: 1, b: 1, a: 1}
   indexColor: {r: 0, g: 0, b: 0, a: 1}
   comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
@@ -30526,11 +30526,11 @@ MonoBehaviour:
   inputCanvas: {fileID: 451384603}
   randomButton: {fileID: 1271584805}
   mainCamera: {fileID: 1085726234}
-  spacing: 200
+  spacing: 40
   textColor: {r: 1, g: 1, b: 1, a: 1}
   comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   sortingDelay: 1
-  swapSpeed: 3
+  swapSpeed: 2
   lowText: {fileID: 1449782517}
   highText: {fileID: 795048242}
   pivotText: {fileID: 1842985036}
@@ -51549,8 +51549,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 26
+  m_fontSizeBase: 26
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -51585,7 +51585,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: -2.9058151, z: 183.54214, w: 26.623995}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -54554,7 +54554,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1527770669
 RectTransform:
   m_ObjectHideFlags: 0
@@ -64173,8 +64173,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 26
+  m_fontSizeBase: 26
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -64209,7 +64209,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 182.08984, w: 23.235409}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

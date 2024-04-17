@@ -278,13 +278,28 @@ public class Quicksort : MonoBehaviour
         textMesh1.transform.localPosition = textMesh2.transform.localPosition;
         textMesh2.transform.localPosition = tempPos;
     }
-
-    private IEnumerator TraverseCube(GameObject cube, Color color, bool isLow = false, bool isHigh = false)
+private IEnumerator TraverseCube(GameObject cube, Color color, bool isLow = false, bool isHigh = false)
+{
+    if (isLow && isHigh)
     {
-        HighlightCube(cube, color, false, isLow, isHigh);
-        yield return new WaitForSeconds(2f);
-        HighlightCube(cube, textColor);
+        // Add code to handle the case when the cube is both "low" and "high"
     }
+    else if (isLow)
+    {
+        HighlightCube(cube, color, false, true, false);
+    }
+    else if (isHigh)
+    {
+        HighlightCube(cube, color, false, false, true);
+    }
+    else
+    {
+        HighlightCube(cube, color);
+    }
+    yield return new WaitForSeconds(2f);
+    HighlightCube(cube, textColor);
+}
+
 private void HighlightCube(GameObject cube, Color color, bool isPivot = false, bool isLow = false, bool isHigh = false)
 {
     TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
@@ -305,7 +320,7 @@ private void HighlightCube(GameObject cube, Color color, bool isPivot = false, b
         {
             textMesh.color = Color.red;
             EnableText(pivotText);
-            pivotText.transform.position = textPosition + Vector3.up * 130f; // Adjust pivot text position
+            pivotText.transform.position = textPosition + Vector3.up * 30f; // Adjust pivot text position
             yOffset = 1.5f;
         }
         else if (isHigh && !isLow)
@@ -360,7 +375,7 @@ private void DisableText(TextMeshProUGUI textObject)
     private void VisualizePartition(int low, int high, int level)
     {
         List<GameObject> clonedCubes = new List<GameObject>();
-        float yOffset = -150f * (generatedCubes.Count - level);
+        float yOffset = -70f * (generatedCubes.Count - level);
 
         for (int i = 0; i < generatedCubes[level].Count; i++)
         {
