@@ -16,7 +16,7 @@ public class Queue : MonoBehaviour
     private Queue<string> numberQueue = new Queue<string>(); // Queue to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = -10f; // Gap between cubes
+    private float gap = 0f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
     private float currentX = 0f; // Current X position for spawning cubes
     private bool isEnqueuing = false; // Flag to check if enqueuing is in progress
@@ -75,7 +75,7 @@ public class Queue : MonoBehaviour
     private IEnumerator MoveCubeToPosition(GameObject cube, Vector3 finalPosition, string number)
     {
         // Instantiate the cube at an initial position far to the right
-        Vector3 initialPosition = finalPosition + Vector3.right * 500f;
+        Vector3 initialPosition = finalPosition + Vector3.right * 5f;
         GameObject newCube = Instantiate(cube, initialPosition, Quaternion.identity);
 
         // Set the number text of the cube
@@ -85,7 +85,7 @@ public class Queue : MonoBehaviour
         cubeDictionary[number] = newCube;
 
         // Move the cube towards its final position gradually
-        float duration = 1.2f; // Duration of the movement
+        float duration = 7f; // Duration of the movement
         float elapsedTime = 0f;
 
         while (elapsedTime < duration)
