@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.XR.ARFoundation;
 
 public class Insertion : MonoBehaviour
 {
+        public ARPlaneManager arPlaneManager;
+
     public GameObject cubePrefab;
     public TMP_InputField inputField;
     public Button randomButton; // Reference to the button
@@ -17,10 +20,11 @@ public class Insertion : MonoBehaviour
     private GameObject[] cubes;
     private bool sortingInProgress = false;
     private bool paused = false;
+    public TextMeshProUGUI infotext;
 
     private void Start()
     {
-        randomButton.onClick.AddListener(GenerateRandomNumbers); // Add listener to the button
+        //randomButton.onClick.AddListener(GenerateRandomNumbers); // Add listener to the button
     }
 
     public void GenerateRandomNumbers()
@@ -32,59 +36,73 @@ public class Insertion : MonoBehaviour
             if (i < 4) randomNumbers += ",";
         }
         inputField.text = randomNumbers;
-        GenerateCubes();
+        //GenerateCubesOnPlane();
     }
 
-    public void GenerateCubes()
+    public void OnSubmitButtonClick()
     {
-        if (sortingInProgress)
-        {
-            // If sorting is already in progress, ignore the button click
-            return;
-        }
 
-        sortingInProgress = true; // Set flag to indicate sorting is in progress
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
 
-        if (cubes != null)
+    private IEnumerator WaitForPlaneDetection()
+    {
+
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
         {
-            // Clean up previously generated cubes
-            foreach (GameObject cube in cubes)
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
             {
-                Destroy(cube);
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    Debug.LogError("No AR planes detected .");
+                    yield return new WaitForSeconds(2f);
+                    // Plane detected, generate cubes on this plane
+                    GenerateCubesOnPlane(arPlane);
+                    yield break; // Exit the coroutine
+                }
             }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
         }
 
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
+        public void GenerateCubesOnPlane(ARPlane plane)
+    {
         string Nos = inputField.text;
         string[] numbers = Nos.Split(',');
 
-        Debug.Log("Number of elements in numbers array: " + numbers.Length); // Debug print
-
-        // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
-
-        // Calculate starting position
-        float startX = -totalWidth / 2f;
-
-        // Initialize currentX to starting position
+        float startX = -0.5f;
         float currentX = startX;
 
-        cubes = new GameObject[numbers.Length]; // Initialize the array to store cube references
+        cubes = new GameObject[numbers.Length];
+        Vector3[] cubePositions = new Vector3[numbers.Length];
+        Vector3 planePosition = plane.transform.position;
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            // Use the current position for each cube
-            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-
-            Debug.Log("Position of cube " + (i + 1) + ": " + cubePosition); // Debug print
-
+            Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
+            cubePositions[i] = cubePosition;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
-            // Update currentX for the next cube
-            currentX += spacing * 2; // Double the spacing to ensure even spacing
+            infotext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
 
-            cubes[i] = cube; // Store reference to the cube in the array
+            currentX += spacing *0.05f;
 
-            // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
+            cubes[i] = cube;
+
             Canvas canvas = cube.GetComponentInChildren<Canvas>();
             if (canvas != null)
             {
@@ -95,9 +113,8 @@ public class Insertion : MonoBehaviour
                     textMesh.color = textColor;
                     textMesh.alignment = TextAlignmentOptions.Center;
 
-                    // Set font size based on cube size
-                    float cubeSize = 24.2f; // Adjust this value based on your cube size
-                    float fontSizeMultiplier = 0.05f; // Adjust this multiplier as needed
+                    float cubeSize = 24.2f;
+                    float fontSizeMultiplier = 4f;
                     textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
                 }
                 else
@@ -110,7 +127,12 @@ public class Insertion : MonoBehaviour
                 Debug.LogError("Canvas component not found in the children of the cube prefab.");
             }
         }
+        int startIndex = 0;
+        int length = cubes.Length;
+        int midpointIndex = startIndex + length / 2;
 
+        // Divide the array into left and right halves
+       
         StartCoroutine(InsertionSortCoroutine());
     }
 
@@ -119,7 +141,7 @@ public class Insertion : MonoBehaviour
         StopAllCoroutines(); // Stop any ongoing sorting coroutine
         sortingInProgress = false;
         paused = false;
-        GenerateCubes(); // Regenerate cubes and start sorting again
+        //GenerateCubes(); // Regenerate cubes and start sorting again
     }
 
     public void PauseSorting()

@@ -206,10 +206,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 845395794}
-        m_TargetAssemblyTypeName: SelectionSort, Assembly-CSharp
-        m_MethodName: GenerateCubes
+      - m_Target: {fileID: 845395804}
+        m_TargetAssemblyTypeName: Insertion, Assembly-CSharp
+        m_MethodName: OnSubmitButtonClick
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 138177329}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5517,7 +5529,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &138177330
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7907,6 +7919,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Array Ins
       objectReference: {fileID: 0}
+    - target: {fileID: 1391342208587414462, guid: 24c5781ec0ba9fa479ff121b030c28bc,
+        type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2370253639161820366, guid: 24c5781ec0ba9fa479ff121b030c28bc,
         type: 3}
       propertyPath: m_Pivot.x
@@ -8005,6 +8022,11 @@ PrefabInstance:
     - target: {fileID: 2370253639161820366, guid: 24c5781ec0ba9fa479ff121b030c28bc,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2523060128018890776, guid: 24c5781ec0ba9fa479ff121b030c28bc,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6089158248389895453, guid: 24c5781ec0ba9fa479ff121b030c28bc,
@@ -19805,8 +19827,20 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 845395794}
         m_TargetAssemblyTypeName: SelectionSort, Assembly-CSharp
-        m_MethodName: GenerateCubes
+        m_MethodName: OnSubmitButtonClick
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1345672748}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -31685,23 +31719,23 @@ MonoBehaviour:
   arPlaneManager: {fileID: 151853166}
   cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
     type: 3}
-  indexPrefab: {fileID: 1594536556256284231, guid: 0be875dc3d4f3ec42b41789cfb3f4738,
+  indexPrefab: {fileID: 7928916772272732999, guid: 2c2faf32a5a2abe4f808fa672245d787,
     type: 3}
   userInputField: {fileID: 892103994}
   submitButton: {fileID: 1771107280}
-  spacing: 0.96
+  spacing: 5
   textColor: {r: 1, g: 1, b: 1, a: 1}
   indexColor: {r: 0, g: 0, b: 0, a: 1}
   comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   indcompColor: {r: 1, g: 0, b: 0, a: 1}
   sortedColor: {r: 0.20784315, g: 0.20784315, b: 0.20784315, a: 1}
-  sortingDelay: 1
-  swapSpeed: 70
-  bubbleInputCanvas: {fileID: 0}
+  sortingDelay: 5
+  swapSpeed: 0.5
+  bubbleInputCanvas: {fileID: 51127156}
   mainCamera: {fileID: 1085726234}
-  proAnchor: {fileID: 0}
+  proAnchor: {fileID: 935485627}
   iterationText: {fileID: 975968197}
-  infotext: {fileID: 0}
+  infotext: {fileID: 975968197}
 --- !u!114 &845395792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31740,10 +31774,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 042fa92f0df294f418965b67b1fa7112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arPlaneManager: {fileID: 151853166}
   cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
     type: 3}
-  inputField: {fileID: 0}
-  inputCanvas: {fileID: 0}
+  userInputField: {fileID: 1396393642}
+  inputCanvas: {fileID: 1345672748}
   mainCamera: {fileID: 1085726234}
   spacing: 5
   textColor: {r: 1, g: 1, b: 1, a: 1}
@@ -31751,7 +31786,13 @@ MonoBehaviour:
   smallestColor: {r: 1, g: 0, b: 0, a: 1}
   sortingDelay: 1
   swapSpeed: 12
+  indexPrefab: {fileID: 7928916772272732999, guid: 2c2faf32a5a2abe4f808fa672245d787,
+    type: 3}
+  indexColor: {r: 0, g: 0, b: 0, a: 1}
+  scaleFactor: 0
   iterationText: {fileID: 975968197}
+  infotext: {fileID: 975968197}
+  infoCanvas: {fileID: 1589066085}
 --- !u!114 &845395795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31955,15 +31996,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4632f366ab3733a43b0766ca3e3b27da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arPlaneManager: {fileID: 151853166}
   cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
     type: 3}
   inputField: {fileID: 381524706}
   randomButton: {fileID: 51889357}
-  spacing: 2
+  spacing: 5
   textColor: {r: 1, g: 1, b: 1, a: 1}
   comparisonColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  sortingDelay: 1
-  swapSpeed: 12
+  sortingDelay: 10
+  swapSpeed: 0.5
+  infotext: {fileID: 975968197}
 --- !u!114 &845395805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32970,6 +33013,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Cube
+      objectReference: {fileID: 0}
+    - target: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -35152,6 +35200,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 933881440}
   m_CullTransparentMesh: 1
+--- !u!1 &935485627
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 935485628}
+  m_Layer: 0
+  m_Name: ProAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &935485628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935485627}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &936075565
 GameObject:
   m_ObjectHideFlags: 0
@@ -58654,6 +58733,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Array Del
       objectReference: {fileID: 0}
+    - target: {fileID: 1391342208587414462, guid: 24c5781ec0ba9fa479ff121b030c28bc,
+        type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2370253639161820366, guid: 24c5781ec0ba9fa479ff121b030c28bc,
         type: 3}
       propertyPath: m_Pivot.x
@@ -58752,6 +58836,11 @@ PrefabInstance:
     - target: {fileID: 2370253639161820366, guid: 24c5781ec0ba9fa479ff121b030c28bc,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2523060128018890776, guid: 24c5781ec0ba9fa479ff121b030c28bc,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6089158248389895453, guid: 24c5781ec0ba9fa479ff121b030c28bc,
@@ -59617,6 +59706,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1586890127}
   m_CullTransparentMesh: 1
+--- !u!1 &1589066085 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 241427142912788649, guid: 24c5781ec0ba9fa479ff121b030c28bc,
+    type: 3}
+  m_PrefabInstance: {fileID: 9149444982910219775}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1590341000
 GameObject:
   m_ObjectHideFlags: 0
@@ -64706,6 +64801,7 @@ RectTransform:
   - {fileID: 74154390}
   - {fileID: 2042488338}
   - {fileID: 864628127}
+  - {fileID: 3442944083863164654}
   - {fileID: 2471122770021068919}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -65908,10 +66004,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 845395794}
-        m_TargetAssemblyTypeName: SelectionSort, Assembly-CSharp
-        m_MethodName: GenerateCubes
+      - m_Target: {fileID: 845395791}
+        m_TargetAssemblyTypeName: CubeGenerator, Assembly-CSharp
+        m_MethodName: OnSubmitButtonClick
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 51127156}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -69642,7 +69750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3355cc12e0dcda54a906bda422e5154d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  productAnchor: {fileID: 0}
+  productAnchor: {fileID: 935485628}
   placed: 0
 --- !u!114 &1896364154
 MonoBehaviour:
@@ -78417,6 +78525,74 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2144365636}
   m_CullTransparentMesh: 1
+--- !u!1001 &498713094869465490
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1742678290}
+    m_Modifications:
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -289.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -514
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7928916772272732999, guid: 2c2faf32a5a2abe4f808fa672245d787,
+        type: 3}
+      propertyPath: m_Name
+      value: Index
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2c2faf32a5a2abe4f808fa672245d787, type: 3}
 --- !u!1001 &891726464977617767
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -78701,6 +78877,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 364345575531776681, guid: 9345f4ac1d8a88c4dad510f186652833,
     type: 3}
   m_PrefabInstance: {fileID: 1491619782344788078}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3442944083863164654 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5226389071841048192, guid: 2c2faf32a5a2abe4f808fa672245d787,
+    type: 3}
+  m_PrefabInstance: {fileID: 498713094869465490}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5214591598045136834
 PrefabInstance:
@@ -79182,3 +79364,4 @@ SceneRoots:
   - {fileID: 1072830988}
   - {fileID: 94568573}
   - {fileID: 1279308522}
+  - {fileID: 935485628}

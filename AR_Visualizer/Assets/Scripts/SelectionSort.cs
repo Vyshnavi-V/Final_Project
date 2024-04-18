@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.XR.ARFoundation;
 
 public class SelectionSort : MonoBehaviour
 {
+     public ARPlaneManager arPlaneManager;
     public GameObject cubePrefab;
-    public TMP_InputField inputField;
+    public TMP_InputField userInputField;
     public GameObject inputCanvas;
     public Camera mainCamera;
     public float spacing = 5f;
@@ -15,17 +17,24 @@ public class SelectionSort : MonoBehaviour
     public Color smallestColor = Color.red; // Color for the smallest element
     public float sortingDelay = 1f; // Delay before starting the sorting process
     public float swapSpeed = 12f;
+    public GameObject indexPrefab;
+    public Color indexColor = Color.black;
+    public float scaleFactor;
 
     private GameObject[] cubes;
     private bool sortingInProgress = false;
     private bool paused = false;
     public TextMeshProUGUI iterationText;
+     public TextMeshProUGUI infotext;
+    public GameObject infoCanvas;
+    private GameObject[] indexes;
 
     private void Start()
     {
         // You can add a listener to the submit button or call GenerateCubes() from elsewhere in your code.
     }
 
+/*
     public void GenerateRandomCubes()
     {
         int cubeCount = Random.Range(5, 10); // Generates a random number between 5 and 10
@@ -39,99 +48,133 @@ public class SelectionSort : MonoBehaviour
         inputField.text = string.Join(",", randomNumbers); // Sets the input field text to the generated random numbers
         GenerateCubes(); // Calls the existing method to generate and sort the cubes
     }
-
-    public void GenerateCubes()
+*/
+public void OnSubmitButtonClick()
     {
-        inputCanvas.SetActive(false);
+
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
+
+    private IEnumerator WaitForPlaneDetection()
+    {
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
+        {
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
+            {
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    yield return new WaitForSeconds(2f);
+                    // Plane detected, generate cubes on this plane
+                    GenerateCubesOnPlane(arPlane);
+                    yield break; // Exit the coroutine
+                }
+            }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+        }
+
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
+
+    public void GenerateCubesOnPlane(ARPlane plane)
+    {
+        infotext.text = "This is called";
+        
         if (sortingInProgress)
         {
-            // If sorting is already in progress, ignore the button click
             return;
         }
 
-        sortingInProgress = true; // Set flag to indicate sorting is in progress
+        sortingInProgress = true;
 
-        if (cubes != null)
-        {
-            // Clean up previously generated cubes
-            foreach (GameObject cube in cubes)
-            {
-                Destroy(cube);
-            }
-        }
+        // Hide the BubbleInputCanvas
 
-        string Nos = inputField.text;
-        string[] numbers = Nos.Split(',');
+        // Destroy previous cubes and indexes
 
-        Debug.Log("Number of elements in numbers array: " + numbers.Length); // Debug print
+        string userInput = userInputField.text;
+        string[] numbers = userInput.Split(',');
 
         // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
-
-        // Calculate starting position
-        float startX = -totalWidth / 2f;
-
-        // Initialize currentX to starting position
+        float startX = -0.5f;
+        Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
+        Vector3 planePosition = plane.transform.position;
+        //MoveCube(infoCanvas, planePosition);
+        infotext.text = "Move kazhinj";
         float currentX = startX;
 
-        cubes = new GameObject[numbers.Length]; // Initialize the array to store cube references
+        cubes = new GameObject[numbers.Length];
+        indexes = new GameObject[numbers.Length];
 
-        // Create a parent GameObject for the cubes
-        GameObject proAnchor = new GameObject("proAnchor");
-        Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
-        GameObject cube1 = Instantiate(cubePrefab,cubePosition,Quaternion.identity);
-        /*
         for (int i = 0; i < numbers.Length; i++)
         {
-            // Use the current position for each cube
-            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+            infotext.text = "Foril keri";
+            Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
 
-            Debug.Log("Position of cube " + (i + 1) + ": " + cubePosition); // Debug print
-
+            // Adjust position relative to the plane
+            Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y, planePosition.z + 1f); // Adjust position relative to the plane
+            infotext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+            GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
 
-            // Set the cube as a child of the proAnchor GameObject
-            cube.transform.SetParent(proAnchor.transform);
+            currentX += spacing*0.05f;
 
-            // Update currentX for the next cube
-            currentX += spacing * 0.1f; // Double the spacing to ensure even spacing
+            cubes[i] = cube;
+            indexes[i] = index;
 
-            cubes[i] = cube; // Store reference to the cube in the array
+            // Set up cube and index UI
+            SetupCubeAndIndexUI(cube, index, numbers[i], i);
 
-            // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
-            Canvas canvas = cube.GetComponentInChildren<Canvas>();
-            if (canvas != null)
+        }
+
+        // Start sorting coroutine
+        StartCoroutine(SelectionSortCoroutine());
+    }
+ private void SetupCubeAndIndexUI(GameObject cube, GameObject index, string number, int indexNumber)
+    {
+        Canvas canvas = cube.GetComponentInChildren<Canvas>();
+        Canvas indexCanvas = index.GetComponentInChildren<Canvas>();
+
+        if (canvas != null && indexCanvas != null)
+        {
+            TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI indexTextMesh = indexCanvas.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (textMesh != null && indexTextMesh != null)
             {
-                TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
-                if (textMesh != null)
-                {
-                    textMesh.text = numbers[i];
-                    textMesh.color = textColor;
-                    textMesh.alignment = TextAlignmentOptions.Center;
+                textMesh.text = number;
+                textMesh.color = textColor;
+                textMesh.alignment = TextAlignmentOptions.Center;
 
-                    // Set font size based on cube size
-                    //float cubeSize = 24.2f; // Adjust this value based on your cube size
-                    //float fontSizeMultiplier = 0.05f; // Adjust this multiplier as needed
-                    //textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
-                }
-                else
-                {
-                    Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube prefab.");
-                }
+                indexTextMesh.text = indexNumber.ToString();
+                indexTextMesh.color = indexColor;
+                indexTextMesh.alignment = TextAlignmentOptions.Center;
+
+                float cubeSize = 24.2f;
+                float fontSizeMultiplier = 4f;
+                textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
+                indexTextMesh.fontSize = Mathf.RoundToInt(cubeSize * 10f);
             }
             else
             {
-                Debug.LogError("Canvas component not found in the children of the cube prefab.");
-            }*/
-        //}
-
-        //StartCoroutine(SelectionSortCoroutine());
-
-        // Focus camera on generated cubes
-        //FocusCameraOnCubes();
-
-        // Hide input canvas
-        
+                Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube or index prefab.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Canvas component not found in the children of the cube or index prefab.");
+        }
     }
 
     private void FocusCameraOnCubes()
@@ -169,7 +212,7 @@ public class SelectionSort : MonoBehaviour
         StopAllCoroutines(); // Stop any ongoing sorting coroutine
         sortingInProgress = false;
         paused = false;
-        GenerateCubes(); // Regenerate cubes and start sorting again
+        //GenerateCubesOnPlane; // Regenerate cubes and start sorting again
     }
 
     private IEnumerator SelectionSortCoroutine()
@@ -213,13 +256,17 @@ public class SelectionSort : MonoBehaviour
             Vector3 tempPosition = cubes[i].transform.position;
             Vector3 newPosition = cubes[minIndex].transform.position;
             // Move cubes up
+            // Calculate the target height based on the cube's original height and your desired scale
             float cubeHeight = cubes[i].GetComponent<Renderer>().bounds.size.y;
-            while (cubes[i].transform.position.y < cubeHeight || cubes[minIndex].transform.position.y < cubeHeight)
-            {
-                cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(cubes[i].transform.position.x, cubeHeight, cubes[i].transform.position.z), Time.deltaTime * swapSpeed);
-                cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(cubes[minIndex].transform.position.x, cubeHeight, cubes[minIndex].transform.position.z), Time.deltaTime * swapSpeed);
-                yield return null;
-            }
+float targetHeight = cubeHeight * scaleFactor;
+
+// Move cubes up
+while (cubes[i].transform.position.y < targetHeight || cubes[minIndex].transform.position.y < targetHeight)
+{
+    cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(cubes[i].transform.position.x, targetHeight, cubes[i].transform.position.z), Time.deltaTime * swapSpeed);
+    cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(cubes[minIndex].transform.position.x, targetHeight, cubes[minIndex].transform.position.z), Time.deltaTime * swapSpeed);
+    yield return null;
+}
 
             // Move cubes horizontally
             while (cubes[i].transform.position.x != newPosition.x || cubes[minIndex].transform.position.x != tempPosition.x)

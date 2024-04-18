@@ -364,10 +364,10 @@ public class CubeGenerator : MonoBehaviour
 
     private void Start()
     {
-        submitButton.onClick.AddListener(OnSubmitButtonClick);
+        //submitButton.onClick.AddListener(OnSubmitButtonClick);
     }
 
-    private void OnSubmitButtonClick()
+    public void OnSubmitButtonClick()
     {
         bubbleInputCanvas.SetActive(false);
 
@@ -553,32 +553,27 @@ public class CubeGenerator : MonoBehaviour
         yield return new WaitForSeconds(sortingDelay);
 
         int n = cubes.Length;
+        bool swapped;
 
-        for (int iteration = 1; iteration < n; iteration++)
+        do
         {
-            bool swapped = false;
-            /*
-            if (iterationText != null)
-            {
-                iterationText.text = "Iteration: " + iteration;
-            }
-            */
+            swapped = false;
             for (int i = 1; i < n; i++)
             {
-                indexes[i].GetComponentInChildren<TextMeshProUGUI>().color = indcompColor;
-                indexes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = indcompColor;
+                // Change color of cubes being compared
+                cubes[i].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
+                cubes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
 
+                // Compare adjacent cubes and swap if necessary
                 int currentValue = int.Parse(cubes[i].GetComponentInChildren<TextMeshProUGUI>().text);
                 int previousValue = int.Parse(cubes[i - 1].GetComponentInChildren<TextMeshProUGUI>().text);
 
                 if (currentValue < previousValue)
                 {
-                    cubes[i].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
-                    cubes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
-
+                    // Lift and swap cubes
                     Vector3 tempPosition = cubes[i].transform.position;
                     Vector3 newPosition = cubes[i - 1].transform.position;
-                    newPosition.y += 0.2f;
+                    newPosition.y += 0.05f; // Lift the cube
 
                     while (cubes[i].transform.position != newPosition)
                     {
@@ -587,33 +582,31 @@ public class CubeGenerator : MonoBehaviour
                         yield return null;
                     }
 
+                    // Swap cube references
                     GameObject tempCube = cubes[i];
                     cubes[i] = cubes[i - 1];
                     cubes[i - 1] = tempCube;
 
                     swapped = true;
-                    cubes[i].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
-                    cubes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
                 }
 
-                indexes[i].GetComponentInChildren<TextMeshProUGUI>().color = indexColor;
-                indexes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = indexColor;
+                // Reset color after comparison
+                cubes[i].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
+                cubes[i - 1].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
 
                 if (paused)
                 {
-                    yield return new WaitWhile(() => paused == true);
+                    yield return new WaitWhile(() => paused == true); // Pause the sorting process
                 }
 
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.5f); // Adjust the delay as needed for visualization
             }
+            n--;
+        } while (swapped);
 
-            cubes[n - iteration].GetComponentInChildren<TextMeshProUGUI>().color = Color.green;
-        }
-
-        cubes[0].GetComponentInChildren<TextMeshProUGUI>().color = Color.green;
-        sortingInProgress = false;
-        //.text = "Sorted";
+        sortingInProgress = false; // Sorting is complete
     }
+    
 
     public void PauseSorting()
     {
