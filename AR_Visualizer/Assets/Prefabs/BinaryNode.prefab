@@ -256,13 +256,13 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 3
+    widthMultiplier: 0.005
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.3479576
-        value: 1
+        time: 0.3236885
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 0

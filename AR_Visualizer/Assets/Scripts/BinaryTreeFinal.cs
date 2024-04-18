@@ -346,44 +346,62 @@ public class BinaryTreeFinal : MonoBehaviour
             node.visual.transform.position = new Vector3(posX, posY, 0);
         }
     }
-
-    private void DrawLines()
+private void DrawLines()
+{
+    // Destroy existing lines
+    foreach (Node node in nodes)
     {
-        // Destroy existing lines
-        foreach (Node node in nodes)
+        foreach (GameObject line in node.lines)
         {
-            foreach (GameObject line in node.lines)
-            {
-                Destroy(line);
-            }
-            node.lines.Clear();
+            Destroy(line);
         }
+        node.lines.Clear();
+    }
 
-        // Draw new lines
-        foreach (Node node in nodes)
+    // Draw new lines
+    foreach (Node node in nodes)
+    {
+        if (node == root) // If the current node is the root
         {
             if (node.left != null)
             {
-                DrawLine(node.visual.transform.position, node.left.visual.transform.position, node.lines);
+                DrawLine(node.visual.transform.position, node.left.visual.transform.position, node.lines, Color.red); // Draw line to left child in red
             }
             if (node.right != null)
             {
-                DrawLine(node.visual.transform.position, node.right.visual.transform.position, node.lines);
+                DrawLine(node.visual.transform.position, node.right.visual.transform.position, node.lines, Color.blue); // Draw line to right child in blue
+            }
+        }
+        else
+        {
+            if (node.left != null)
+            {
+                Color lineColor = (node.value < root.value) ? Color.red : Color.blue; // Determine line color based on node value compared to root value
+                DrawLine(node.visual.transform.position, node.left.visual.transform.position, node.lines, lineColor);
+            }
+            if (node.right != null)
+            {
+                Color lineColor = (node.value < root.value) ? Color.red : Color.blue; // Determine line color based on node value compared to root value
+                DrawLine(node.visual.transform.position, node.right.visual.transform.position, node.lines, lineColor);
             }
         }
     }
+}
 
-    private void DrawLine(Vector3 start, Vector3 end, List<GameObject> lines)
-    {
-        GameObject lineObject = new GameObject("Line");
-        LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = 4f;
-        lineRenderer.endWidth = 4f;
-        lineRenderer.positionCount = 2;
-        lineRenderer.SetPosition(0, start);
-        lineRenderer.SetPosition(1, end);
-        lines.Add(lineObject);
-    }
+
+
+    private void DrawLine(Vector3 start, Vector3 end, List<GameObject> lines, Color color)
+{
+    GameObject lineObject = new GameObject("Line");
+    LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
+    lineRenderer.startWidth = 0.02f;
+    lineRenderer.endWidth = 0.02f;
+    lineRenderer.positionCount = 2;
+    lineRenderer.SetPosition(0, start);
+    lineRenderer.SetPosition(1, end);
+    lineRenderer.material.color = color; // Set line color
+    lines.Add(lineObject);
+}
 
     public void ResetColorsAndText()
     {
