@@ -3,9 +3,12 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.XR.ARFoundation;
 
 public class Queue : MonoBehaviour
 {
+    public ARPlaneManager arPlaneManager;
+
     public GameObject cubePrefab;
     public TMP_InputField inputField;
     public Button insertButton; // Button for enqueue operation
@@ -25,12 +28,49 @@ public class Queue : MonoBehaviour
     private float delay = 2f; // Delay between cube generation
     private float currentX = 0f; // Current X position for spawning cubes
     private bool isEnqueuing = false; // Flag to check if enqueuing is in progress
+    private ARPlane trackPlane;
+    public TextMeshProUGUI infotext;
 
     private void Start()
     {
         cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.x; // Get the size of the cube
     }
+public void OnSubmitButtonClick()
+    {
 
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
+    private IEnumerator WaitForPlaneDetection()
+    {
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
+        {
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
+            {
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    yield return new WaitForSeconds(2f);
+                    // Plane detected, generate cubes on this plane
+                    trackPlane = arPlane;                    
+                    yield break; // Exit the coroutine
+                }
+            }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+        }
+
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
     // Method to enqueue numbers
     public void EnqueueNumbers()
     {
@@ -54,7 +94,7 @@ public class Queue : MonoBehaviour
             if (!string.IsNullOrEmpty(trimmedNumber))
             {
                 numberQueue.Enqueue(trimmedNumber); // Enqueue the number
-                GenerateCube(trimmedNumber); // Generate and visualize the cube
+                GenerateCubesOnPlane(trimmedNumber); // Generate and visualize the cube
                 enqueuedText.text = "Enqueued: " + trimmedNumber; // Update enqueued text
                 yield return new WaitForSeconds(delay); // Add delay before enqueuing the next number
             }
@@ -195,8 +235,9 @@ private void UpdateFrontAndRearTextPositions()
     }
 }
     // Method to generate a cube with a given number
-    private void GenerateCube(string number)
+    private void GenerateCubesOnPlane(string number)
     {
+        currentX = trackPlane.transform.position.x;
         // Increment currentX for the next cube
         currentX += cubeSize + gap; // Adding a small gap between cubes
 

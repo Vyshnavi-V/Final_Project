@@ -3,9 +3,12 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.XR.ARFoundation;
+
 
 public class Stack : MonoBehaviour
 {
+    public ARPlaneManager arPlaneManager;
     public GameObject cubePrefab;
     public GameObject boxPrefab; // Box GameObject
     public TMP_InputField inputField;
@@ -15,13 +18,15 @@ public class Stack : MonoBehaviour
     private Stack<string> numberStack = new Stack<string>(); // Stack to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = 3f; // Gap between cubes
+    private float gap = 0.1f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
     private float currentY = 0f; // Current Y position for spawning cubes
     private bool isPushing = false; // Flag to check if pushing is in progress
+    private ARPlane trackPlane;
 
     private GameObject box; // Reference to the box GameObject
     private RectTransform boxCanvasRect; // RectTransform of the BoxCanvas
+    public TextMeshProUGUI infotext;
 
     private void Start()
     {
@@ -52,6 +57,44 @@ public class Stack : MonoBehaviour
         }
     }
 
+    public void OnSubmitButtonClick()
+    {
+
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
+    private IEnumerator WaitForPlaneDetection()
+    {
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
+        {
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
+            {
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    yield return new WaitForSeconds(2f);
+                    // Plane detected, generate cubes on this plane
+                    trackPlane = arPlane; 
+                    currentY = arPlane.transform.position.y;               
+                    yield break; // Exit the coroutine
+                }
+            }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+        }
+
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
+
     // Coroutine for pushing process
     private IEnumerator PushProcess()
     {
@@ -65,8 +108,8 @@ public class Stack : MonoBehaviour
             string trimmedNumber = number.Trim();
             if (!string.IsNullOrEmpty(trimmedNumber))
             {
-                numberStack.Push(trimmedNumber); // Push the number
-                GenerateCube(trimmedNumber); // Generate and visualize the cube
+                numberStack.Push(trimmedNumber);
+                GenerateCubesOnPlane(trimmedNumber);// Push the number
                 yield return new WaitForSeconds(delay); // Add delay before pushing the next number
             }
         }
@@ -75,23 +118,27 @@ public class Stack : MonoBehaviour
     }
 
     // Method to generate a cube with a given number
-    private void GenerateCube(string number)
-    {
-        // Increment currentY for the next cube
-        currentY += cubeSize + gap; // Adding a small gap between cubes
+    private void GenerateCubesOnPlane(string number)
+{
+    Vector3 planePosition = trackPlane.transform.position;
+    // Set currentY to the plane's Y position
 
-        // Calculate the final position of the cube
-        Vector3 finalPosition = new Vector3(0f, currentY, 0f);
+    // Increment currentY for the next cube
+    currentY += cubeSize+gap; // Adding a small gap between cubes
 
-        // Start the coroutine to move the cube to its final position
-        StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));
-    }
+    // Calculate the final position of the cube
+    Vector3 finalPosition = new Vector3(0f, currentY, 0f);
+
+    // Start the coroutine to move the cube to its final position
+    StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));
+}
+
 
     // Coroutine to move a cube to its final position
     private IEnumerator MoveCubeToPosition(GameObject cube, Vector3 finalPosition, string number)
     {
         // Instantiate the cube at an initial position far below
-        Vector3 initialPosition = finalPosition + Vector3.up * 20f;
+        Vector3 initialPosition = finalPosition + Vector3.up * 0.05f;
         GameObject newCube = Instantiate(cube, initialPosition, Quaternion.identity);
 
         // Set the number text of the cube
@@ -155,7 +202,7 @@ public class Stack : MonoBehaviour
     private IEnumerator MoveAndDestroyCube(GameObject cube)
     {
         Vector3 initialPosition = cube.transform.position;
-        Vector3 finalPosition = initialPosition + Vector3.down * 20f;
+        Vector3 finalPosition = initialPosition + Vector3.up * 1f;
         float duration = 1.2f; // Duration of the movement
         float elapsedTime = 0f;
 
