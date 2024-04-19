@@ -171,6 +171,9 @@ public class Quicksort : MonoBehaviour
                     textMesh.text = numbers[i];
                     textMesh.color = textColor;
                     textMesh.alignment = TextAlignmentOptions.Center;
+                     float cubeSize = 24.2f;
+                float fontSizeMultiplier = 4f;
+                textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
                 }
                 else
                 {
@@ -478,7 +481,7 @@ private void DisableText(TextMeshProUGUI textObject)
     private void VisualizePartition(int low, int high, int level)
     {
         List<GameObject> clonedCubes = new List<GameObject>();
-        float yOffset = -70f * (generatedCubes.Count - level);
+        float yOffset = -0.07f * (generatedCubes.Count - level);
 
         for (int i = 0; i < generatedCubes[level].Count; i++)
         {

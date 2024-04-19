@@ -371,25 +371,52 @@ private float spacing = 5f;
         }
     }
 
-    private void AssignPositions(Node node, int level, float position)
+//     private void AssignPositions(Node node, int level, float position)
+// {
+//     infotext.text = "node created";
+//     if (node != null)
+//     {
+//         if (node == root) // If the node is the root
+//         {
+//             // Set the root node position above the detected plane
+//             node.position = trackPlane.transform.position.y + verticalSpacing;
+//         }
+//         else
+//         {
+//             node.position = position;
+
+//             // Calculate new horizontal spacing based on the level
+//             float horizontalSpacing = initialHorizontalSpacing - horizontalSpacingDecrease * level;
+
+//             AssignPositions(node.left, level + 1, position - horizontalSpacing); // Left child
+//             AssignPositions(node.right, level + 1, position + horizontalSpacing); // Right child
+//         }
+//     }
+// }
+private void AssignPositions(Node node, int level, float position)
 {
-    infotext.text = "node created";
     if (node != null)
     {
-        if (node == root) // If the node is the root
+        // Check if it's the root node
+        if (level == 0)
         {
-            // Set the root node position above the detected plane
-            node.position = trackPlane.transform.position.y + verticalSpacing;
+            // Position the root node at the plane's position
+            node.position = 0f; // Or set it to the desired x-position of the plane
         }
         else
         {
-            node.position = position;
-
             // Calculate new horizontal spacing based on the level
             float horizontalSpacing = initialHorizontalSpacing - horizontalSpacingDecrease * level;
 
-            AssignPositions(node.left, level + 1, position - horizontalSpacing); // Left child
-            AssignPositions(node.right, level + 1, position + horizontalSpacing); // Right child
+            // Assign positions for left and right children based on root's position
+            if (node.left != null)
+            {
+                AssignPositions(node.left, level + 1, position - horizontalSpacing);
+            }
+            if (node.right != null)
+            {
+                AssignPositions(node.right, level + 1, position + horizontalSpacing);
+            }
         }
     }
 }

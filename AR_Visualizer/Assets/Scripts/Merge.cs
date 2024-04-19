@@ -25,7 +25,7 @@ public class Merge : MonoBehaviour
     public TextMeshProUGUI infoText;
     public Canvas userCanvas;
     public Canvas exitCanvas;
-
+     public Canvas infoCanvas;
 
 
     private GameObject[] cubes;
@@ -100,7 +100,7 @@ public class Merge : MonoBehaviour
         float totalWidth = (numbers.Length - 1) * spacing;
         float startX = -0.5f;
         float currentX = startX;
-        float startY = 0f;
+       // float startY = 0f;
 
         cubes = new GameObject[numbers.Length];
         Vector3[] cubePositions = new Vector3[numbers.Length];
@@ -117,6 +117,7 @@ public class Merge : MonoBehaviour
             currentX += spacing *0.05f;
             //movePPRCanvas(userCanvas,planePosition);
             moveBackCanvas(exitCanvas,planePosition);
+            moveInfoCanvas(infoCanvas,planePosition);
             
 
             cubes[i] = cube;
@@ -1288,6 +1289,24 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
     if (canvasRect != null)
     {
         canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveInfoCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetY = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(0f, offsetY, 0f);
     }
     else
     {
