@@ -19,12 +19,15 @@ public class Queue : MonoBehaviour
     public TextMeshProUGUI R; // Text for rear pointer2
     public TextMeshProUGUI enqueuedText; // Text for showing enqueued number
     public TextMeshProUGUI dequeuedText; // Text for showing dequeued number
-    public TextMeshProUGUI queueStatusText; // Text for showing queue status
+    public TextMeshProUGUI queueStatusText;
+      public Canvas opcanvas;
+    public Canvas exitCanvas; // Text for showing queue status
 
+private float spacing = 5f;
     private Queue<string> numberQueue = new Queue<string>(); // Queue to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = 0f; // Gap between cubes
+    private float gap = 0.005f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
     private float currentX = 0f; // Current X position for spawning cubes
     private bool isEnqueuing = false; // Flag to check if enqueuing is in progress
@@ -57,7 +60,12 @@ public void OnSubmitButtonClick()
                     infotext.text = "plane detected";
                     yield return new WaitForSeconds(2f);
                     // Plane detected, generate cubes on this plane
-                    trackPlane = arPlane;                    
+                    trackPlane = arPlane;
+                    Vector3 planePosition = trackPlane.transform.position;
+                  movePPRCanvas(opcanvas,planePosition);
+                    moveBackCanvas(exitCanvas,planePosition);
+                            currentX = trackPlane.transform.position.x;
+           
                     yield break; // Exit the coroutine
                 }
             }
@@ -108,7 +116,7 @@ public void OnSubmitButtonClick()
     private IEnumerator MoveCubeToPosition(GameObject cube, Vector3 finalPosition, string number)
     {
         // Instantiate the cube at an initial position far to the right
-        Vector3 initialPosition = finalPosition + Vector3.right * 5f;
+        Vector3 initialPosition = finalPosition + Vector3.right * 0.05f;
         GameObject newCube = Instantiate(cube, initialPosition, Quaternion.identity);
 
         // Set the number text of the cube
@@ -237,7 +245,6 @@ private void UpdateFrontAndRearTextPositions()
     // Method to generate a cube with a given number
     private void GenerateCubesOnPlane(string number)
     {
-        currentX = trackPlane.transform.position.x;
         // Increment currentX for the next cube
         currentX += cubeSize + gap; // Adding a small gap between cubes
 
@@ -247,4 +254,40 @@ private void UpdateFrontAndRearTextPositions()
         // Start the coroutine to move the cube to its final position
         StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));
     }
+     private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
 }

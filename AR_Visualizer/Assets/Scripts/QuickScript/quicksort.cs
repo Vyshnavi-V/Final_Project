@@ -3,9 +3,13 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.XR.ARFoundation;
+
 
 public class Quicksort : MonoBehaviour
 {
+            public ARPlaneManager arPlaneManager;
+
     public GameObject cubePrefab;
     public TMP_InputField inputField;
     public GameObject inputCanvas;
@@ -20,10 +24,15 @@ public class Quicksort : MonoBehaviour
     public TextMeshProUGUI lowText;
     public TextMeshProUGUI highText;
     public TextMeshProUGUI pivotText;
+        public TextMeshProUGUI infotext;
+
+    public Canvas userCanvas;
 
     private List<List<GameObject>> generatedCubes = new List<List<GameObject>>();
     private bool sortingInProgress = false;
     private bool paused = false;
+        private ARPlane trackPlane;
+
 
     private void Start()
     {
@@ -43,7 +52,7 @@ public class Quicksort : MonoBehaviour
 
         string[] randomNumbers = GenerateRandomArray(5);
 
-        GenerateInitialCubes(randomNumbers);
+       // GenerateInitialCubes(randomNumbers);
     }
 
     private string[] GenerateRandomArray(int length)
@@ -55,14 +64,65 @@ public class Quicksort : MonoBehaviour
         }
         return randomArray;
     }
+    public void OnSubmitButtonClick()
+    {
 
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
+
+    private IEnumerator WaitForPlaneDetection()
+    {
+
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
+        {
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
+            {
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    Debug.LogError("No AR planes detected .");
+                    yield return new WaitForSeconds(2f);
+                    // Plane detected, generate cubes on this plane
+                    trackPlane = arPlane;
+                    GenerateCubes();
+                    yield break; // Exit the coroutine
+                }
+            }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+        }
+
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
     public void GenerateCubes()
     {
+       foreach (List<GameObject> cubeList in generatedCubes)
+        {
+            foreach (GameObject cube in cubeList)
+            {
+                // Ensure the GameObject is valid before attempting to destroy it
+                if (cube != null)
+                {
+                    Destroy(cube);
+                }
+            }
+        }
         if (sortingInProgress)
         {
             return;
         }
-
+        Vector3 position = new Vector3(0f,0f,0f);
+        moveCanvas(userCanvas,position);
         sortingInProgress = true;
 
         if (generatedCubes.Count > 0)
@@ -81,24 +141,24 @@ public class Quicksort : MonoBehaviour
         string Nos = inputField.text;
         string[] numbers = Nos.Split(',');
 
-        GenerateInitialCubes(numbers);
+        GenerateInitialCubesOnPlane(numbers);
     }
-
-    private void GenerateInitialCubes(string[] numbers)
+ private void GenerateInitialCubesOnPlane(string[] numbers)
     {
         float totalWidth = (numbers.Length - 1) * spacing;
-        float startX = -totalWidth / 2f;
+        float startX = -0.5f;
         float currentX = startX;
 
         List<GameObject> initialCubes = new List<GameObject>();
+        Vector3 planePosition = trackPlane.transform.position;
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+            Vector3 cubePosition = new Vector3(planePosition.x+currentX, 0f, 0f);
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
-            currentX += spacing;
+            currentX += spacing*0.05f;
 
             initialCubes.Add(cube);
 
@@ -127,6 +187,49 @@ public class Quicksort : MonoBehaviour
 
         StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0));
     }
+    // private void GenerateInitialCubes(string[] numbers)
+    // {
+    //     float totalWidth = (numbers.Length - 1) * spacing;
+    //     float startX = -totalWidth / 2f;
+    //     float currentX = startX;
+
+    //     List<GameObject> initialCubes = new List<GameObject>();
+
+    //     for (int i = 0; i < numbers.Length; i++)
+    //     {
+    //         Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+
+    //         GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+
+    //         currentX += spacing;
+
+    //         initialCubes.Add(cube);
+
+    //         Canvas canvas = cube.GetComponentInChildren<Canvas>();
+    //         if (canvas != null)
+    //         {
+    //             TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
+    //             if (textMesh != null)
+    //             {
+    //                 textMesh.text = numbers[i];
+    //                 textMesh.color = textColor;
+    //                 textMesh.alignment = TextAlignmentOptions.Center;
+    //             }
+    //             else
+    //             {
+    //                 Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube prefab.");
+    //             }
+    //         }
+    //         else
+    //         {
+    //             Debug.LogError("Canvas component not found in the children of the cube prefab.");
+    //         }
+    //     }
+
+    //     generatedCubes.Add(initialCubes);
+
+    //     StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0));
+    // }
 
     private void FocusCameraOnCubes()
     {
@@ -406,4 +509,25 @@ private void DisableText(TextMeshProUGUI textObject)
             StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0));
         }
     }
+    private void moveCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+
+
+
 }

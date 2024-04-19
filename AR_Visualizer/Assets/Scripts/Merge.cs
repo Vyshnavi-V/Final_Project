@@ -23,6 +23,8 @@ public class Merge : MonoBehaviour
     public Material lineMaterial; // Material for the line renderer
     public TextMeshProUGUI infotext;
     public TextMeshProUGUI infoText;
+    public Canvas userCanvas;
+    public Canvas exitCanvas;
 
 
 
@@ -113,6 +115,9 @@ public class Merge : MonoBehaviour
             infotext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
 
             currentX += spacing *0.05f;
+            //movePPRCanvas(userCanvas,planePosition);
+            moveBackCanvas(exitCanvas,planePosition);
+            
 
             cubes[i] = cube;
 
@@ -404,9 +409,10 @@ public class Merge : MonoBehaviour
                     
 
                     // Compare the values of cubes
+                    int firstValue =int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
                     int currentValue = int.Parse(currentCube.GetComponentInChildren<TextMeshProUGUI>().text);
                     int nextValue = int.Parse(nextCube.GetComponentInChildren<TextMeshProUGUI>().text);
-                    infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
+                   
 
                     // Determine the direction to move the cubes
                     Vector3 currentCubeTargetPosition = currentCube.transform.position;
@@ -416,8 +422,10 @@ public class Merge : MonoBehaviour
                     {
                         HighlightCube(firstcube);
                         firstCubeTargetPosition.y -= spacing*0.05f;
+                        infoText.text = "Merge" + "(" + firstValue + ")";
                         yield return StartCoroutine(SmoothMoveCube(firstcube, firstCubeTargetPosition));
                         yield return new WaitForSeconds(divisionDelay);
+                         infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
                         HighlightCubes(currentCube, nextCube);
                         nextCubeTargetPosition.x -= spacing*0.05f;
                         nextCubeTargetPosition.y -= spacing*0.05f;
@@ -441,8 +449,10 @@ public class Merge : MonoBehaviour
                         nextCubeTargetPosition.y -= spacing*0.05f;
                         firstCubeTargetPosition.y -= spacing*0.05f;
                         HighlightCube(firstcube);
+                        infoText.text = "Merge" + "(" + firstValue + ")";
                         yield return StartCoroutine(SmoothMoveCube(firstcube,firstCubeTargetPosition));
                         yield return new WaitForSeconds(divisionDelay);
+                         infoText.text = "Merge" + "(" + currentValue + "," + nextValue + ")";
                         HighlightCubes(currentCube, nextCube);
 
                         yield return StartCoroutine(SmoothMoveCube(currentCube, currentCubeTargetPosition));
@@ -752,7 +762,8 @@ public class Merge : MonoBehaviour
             int value2Cube2 = int.Parse(cube2.GetComponentInChildren<TextMeshProUGUI>().text);
             int value1Cube3 = int.Parse(cube3.GetComponentInChildren<TextMeshProUGUI>().text);
             int value2Cube4 = int.Parse(cube4.GetComponentInChildren<TextMeshProUGUI>().text);
-            Debug.Log(value1Cube1 + " " + value2Cube2 + " " + value1Cube3 + " " + value2Cube4);
+            infoText.text = value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3 + " ," + value2Cube4;
+            Debug.Log(value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3 + " ," + value2Cube4);
             Vector3 cube1Position = cube1.transform.position;
             Vector3 cube2Position = cube2.transform.position;
             Vector3 cube3Position = cube2.transform.position + Vector3.right * 4f * small;
@@ -900,7 +911,7 @@ public class Merge : MonoBehaviour
             int value1Cube1 = int.Parse(cube1.GetComponentInChildren<TextMeshProUGUI>().text);
             int value2Cube2 = int.Parse(cube2.GetComponentInChildren<TextMeshProUGUI>().text);
             int value1Cube3 = int.Parse(cube3.GetComponentInChildren<TextMeshProUGUI>().text);
-
+            infoText.text = value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3;
             Debug.Log(value1Cube1 + " " + value2Cube2 + " " + value1Cube3);
             Vector3 cube1Position = cube1.transform.position;
             Vector3 cube2Position = cube1.transform.position + Vector3.right * 4f * small;
@@ -982,6 +993,7 @@ public class Merge : MonoBehaviour
         }
         else if (startIndex + 1 < sortedCubes.Count)
         {
+           // infoText.text = value1Cube1 + ", " + value2Cube2;
             GameObject cube1 = sortedCubes[startIndex];
             GameObject cube2 = sortedCubes[startIndex + 1];
             Vector3 cube1Position = cube1.transform.position;
@@ -999,6 +1011,7 @@ public class Merge : MonoBehaviour
             Vector3 cube1Position = cube1.transform.position;
             sortedAndGrouped.Add(cube1);
             Vector3 cube1new = cube1Position - Vector3.up * spacing * small;
+            //infoText.text = value1Cube1;
             yield return StartCoroutine(SmoothMoveCubeGroups(cube1, cube1.transform.position, cube1new));
 
 
@@ -1199,7 +1212,88 @@ public class Merge : MonoBehaviour
         cube1.transform.position = startPositionCube2;
         cube2.transform.position = startPositionCube1;
     }
+    public void DestroyAllObjects()
+{
+    // Destroy cubes
+    if (cubes != null)
+    {
+        foreach (GameObject cube in cubes)
+        {
+            Destroy(cube);
+        }
+        cubes = null; // Reset the cubes array
+    }
 
+    // Destroy sortedAndGroupedLeft list
+    foreach (GameObject obj in sortedAndGroupedLeft)
+    {
+        Destroy(obj);
+    }
+    sortedAndGroupedLeft.Clear(); // Clear the list
+
+    // Destroy sortedAndGroupedRight list
+    foreach (GameObject obj in sortedAndGroupedRight)
+    {
+        Destroy(obj);
+    }
+    sortedAndGroupedRight.Clear(); // Clear the list
+
+    // Destroy division lines
+    foreach (GameObject line in divisionLines)
+    {
+        Destroy(line);
+    }
+    divisionLines.Clear(); // Clear the list
+
+    // Destroy final sorted objects
+    foreach (GameObject obj in finalSorted)
+    {
+        Destroy(obj);
+    }
+    finalSorted.Clear(); // Clear the list
+
+    // Reset other variables and lists
+    divisionPositions.Clear();
+    divisionMaterials.Clear();
+    divisionProcessCompleted = false;
+}
+
+private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
 }
  // public void CreateArray()
     // {

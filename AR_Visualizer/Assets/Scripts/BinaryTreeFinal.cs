@@ -2,9 +2,13 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.XR.ARFoundation;
+
 
 public class BinaryTreeFinal : MonoBehaviour
 {
+    public ARPlaneManager arPlaneManager;
+
     public GameObject nodePrefab;
     public float verticalSpacing = 2.0f;
     public float initialHorizontalSpacing = 250.0f; // Initial horizontal spacing
@@ -15,7 +19,16 @@ public class BinaryTreeFinal : MonoBehaviour
     public TextMeshProUGUI traversalText; // TextMeshPro element to display traversal order
     public float delayBetweenNodes = 0.5f; // Delay between visualizing each node
     private Color initialColor = Color.white; // Initial color of nodes and lines
+    public TextMeshProUGUI infotext;
+    public Canvas traversalCanvas;
+    public Canvas insdelCanvas;
 
+private float spacing = 5f;
+    private ARPlane trackPlane;
+     private void Start()
+    {
+       
+    }
     private class Node
     {
         public int value;
@@ -30,9 +43,52 @@ public class BinaryTreeFinal : MonoBehaviour
     private Node root;
     private List<Node> nodes = new List<Node>();
     private string traversalOrder = ""; // String to store traversal order
-
-    public void AddNodes()
+    public void OnSubmitButtonClick()
     {
+
+        // Start a coroutine to wait for plane detection
+        StartCoroutine(WaitForPlaneDetection());
+    }
+
+    private IEnumerator WaitForPlaneDetection()
+    {
+
+        infotext.text = "Don't move the phone.Waiting for plane detection";
+        float elapsedTime = 0f;
+        float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
+
+        while (elapsedTime < maxWaitTime)
+        {
+            // Check if any planes are detected
+            foreach (var trackable in arPlaneManager.trackables)
+            {
+                if (trackable is ARPlane arPlane)
+                {
+                    infotext.text = "plane detected";
+                    Debug.LogError("No AR planes detected .");
+                    yield return new WaitForSeconds(2f);
+                    trackPlane = arPlane;
+                    AddNodes();
+                    Vector3 planePosition = trackPlane.transform.position;
+                     movePPRCanvas(insdelCanvas,planePosition);
+        moveBackCanvas(traversalCanvas,planePosition);
+                    // Plane detected, generate cubes on this plane
+                    yield break; // Exit the coroutine
+                }
+            }
+
+            // No planes detected yet, wait for a short duration and check again
+            yield return new WaitForSeconds(0.5f);
+            elapsedTime += 0.5f;
+        }
+
+        // No plane detected within the time limit, display error message
+        Debug.LogError("No AR planes detected within the time limit.");
+        infotext.text = "No AR plane detected within 1 minute.";
+    }
+        public void AddNodes()
+    {
+        infotext.text = " Add Nodes";
         string values = inputField.text;
         string[] valueArray = values.Split(',');
 
@@ -41,6 +97,7 @@ public class BinaryTreeFinal : MonoBehaviour
 
     private IEnumerator AddNodesWithDelay(string[] valueArray)
     {
+        infotext.text = " Add NodesDelay";
         foreach (string value in valueArray)
         {
             int intValue;
@@ -255,6 +312,7 @@ public class BinaryTreeFinal : MonoBehaviour
 
     public void AddNode(int value)
     {
+        infotext.text = " Add Node";
         Node newNode = new Node { value = value };
         if (root == null)
         {
@@ -269,6 +327,7 @@ public class BinaryTreeFinal : MonoBehaviour
 
     private void AddNodeToTree(Node current, Node newNode)
     {
+        infotext.text = " Add NodestoTree";
         if (newNode.value < current.value)
         {
             if (current.left == null)
@@ -313,8 +372,16 @@ public class BinaryTreeFinal : MonoBehaviour
     }
 
     private void AssignPositions(Node node, int level, float position)
+{
+    infotext.text = "node created";
+    if (node != null)
     {
-        if (node != null)
+        if (node == root) // If the node is the root
+        {
+            // Set the root node position above the detected plane
+            node.position = trackPlane.transform.position.y + verticalSpacing;
+        }
+        else
         {
             node.position = position;
 
@@ -325,6 +392,8 @@ public class BinaryTreeFinal : MonoBehaviour
             AssignPositions(node.right, level + 1, position + horizontalSpacing); // Right child
         }
     }
+}
+
 
     private void UpdateNodePositions()
     {
@@ -418,6 +487,43 @@ private void DrawLines()
         // Clear traversal text
        traversalText.text = "";
     }
+    private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+
 
   
 }

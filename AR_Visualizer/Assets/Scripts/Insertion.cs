@@ -16,11 +16,14 @@ public class Insertion : MonoBehaviour
     public Color comparisonColor = Color.yellow; // Color for cubes being compared
     public float sortingDelay = 1f; // Delay before starting the sorting process
     public float swapSpeed = 12f;
+      public Canvas userCanvas;
+    public Canvas exitCanvas;
 
     private GameObject[] cubes;
     private bool sortingInProgress = false;
     private bool paused = false;
     public TextMeshProUGUI infotext;
+    private ARPlane trackPlane;
 
     private void Start()
     {
@@ -64,6 +67,7 @@ public class Insertion : MonoBehaviour
                     Debug.LogError("No AR planes detected .");
                     yield return new WaitForSeconds(2f);
                     // Plane detected, generate cubes on this plane
+                    trackPlane = arPlane;
                     GenerateCubesOnPlane(arPlane);
                     yield break; // Exit the coroutine
                 }
@@ -86,10 +90,13 @@ public class Insertion : MonoBehaviour
         float totalWidth = (numbers.Length - 1) * spacing;
         float startX = -0.5f;
         float currentX = startX;
+       
 
         cubes = new GameObject[numbers.Length];
         Vector3[] cubePositions = new Vector3[numbers.Length];
         Vector3 planePosition = plane.transform.position;
+          movePPRCanvas(userCanvas,planePosition);
+        moveBackCanvas(exitCanvas,planePosition);
 
         for (int i = 0; i < numbers.Length; i++)
         {
@@ -141,7 +148,7 @@ public class Insertion : MonoBehaviour
         StopAllCoroutines(); // Stop any ongoing sorting coroutine
         sortingInProgress = false;
         paused = false;
-        //GenerateCubes(); // Regenerate cubes and start sorting again
+        GenerateCubesOnPlane(trackPlane);// Regenerate cubes and start sorting again
     }
 
     public void PauseSorting()
@@ -234,4 +241,58 @@ public class Insertion : MonoBehaviour
 
         sortingInProgress = false; // Sorting is complete
     }
+    private void moveCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
 }

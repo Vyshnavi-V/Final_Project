@@ -18,11 +18,14 @@ public class Stack : MonoBehaviour
     private Stack<string> numberStack = new Stack<string>(); // Stack to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = 0.1f; // Gap between cubes
+    private float gap = 0.005f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
     private float currentY = 0f; // Current Y position for spawning cubes
     private bool isPushing = false; // Flag to check if pushing is in progress
     private ARPlane trackPlane;
+    private float spacing = 5f;
+    public Canvas opcanvas;
+    public Canvas exitCanvas;
 
     private GameObject box; // Reference to the box GameObject
     private RectTransform boxCanvasRect; // RectTransform of the BoxCanvas
@@ -80,6 +83,9 @@ public class Stack : MonoBehaviour
                     yield return new WaitForSeconds(2f);
                     // Plane detected, generate cubes on this plane
                     trackPlane = arPlane; 
+                    Vector3 planePosition = trackPlane.transform.position;
+                     movePPRCanvas(opcanvas,planePosition);
+                    moveBackCanvas(exitCanvas,planePosition);
                     currentY = arPlane.transform.position.y;               
                     yield break; // Exit the coroutine
                 }
@@ -227,4 +233,42 @@ public class Stack : MonoBehaviour
         // Destroy the cube
         Destroy(cube);
     }
+    private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = 5 * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+
+
 }

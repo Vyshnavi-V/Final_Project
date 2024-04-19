@@ -25,6 +25,10 @@ public class ArrayScriptNew : MonoBehaviour
 
     private List<GameObject> cubes = new List<GameObject>();
 
+ private void Start()
+    {
+      
+    }
     public void OnSubmitButtonClick()
     {
 

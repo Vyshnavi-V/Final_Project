@@ -20,6 +20,8 @@ public class SelectionSort : MonoBehaviour
     public GameObject indexPrefab;
     public Color indexColor = Color.black;
     public float scaleFactor;
+     public Canvas userCanvas;
+    public Canvas exitCanvas;
 
     private GameObject[] cubes;
     private bool sortingInProgress = false;
@@ -28,6 +30,7 @@ public class SelectionSort : MonoBehaviour
      public TextMeshProUGUI infotext;
     public GameObject infoCanvas;
     private GameObject[] indexes;
+    private ARPlane trackPlane;
 
     private void Start()
     {
@@ -72,6 +75,7 @@ public void OnSubmitButtonClick()
                     infotext.text = "plane detected";
                     yield return new WaitForSeconds(2f);
                     // Plane detected, generate cubes on this plane
+                    trackPlane = arPlane;
                     GenerateCubesOnPlane(arPlane);
                     yield break; // Exit the coroutine
                 }
@@ -95,7 +99,8 @@ public void OnSubmitButtonClick()
         {
             return;
         }
-
+        
+        DestroyPreviousCubesAndIndices();
         sortingInProgress = true;
 
         // Hide the BubbleInputCanvas
@@ -113,6 +118,8 @@ public void OnSubmitButtonClick()
         //MoveCube(infoCanvas, planePosition);
         infotext.text = "Move kazhinj";
         float currentX = startX;
+         movePPRCanvas(userCanvas,planePosition);
+        moveBackCanvas(exitCanvas,planePosition);
 
         cubes = new GameObject[numbers.Length];
         indexes = new GameObject[numbers.Length];
@@ -212,7 +219,7 @@ public void OnSubmitButtonClick()
         StopAllCoroutines(); // Stop any ongoing sorting coroutine
         sortingInProgress = false;
         paused = false;
-        //GenerateCubesOnPlane; // Regenerate cubes and start sorting again
+        GenerateCubesOnPlane(trackPlane); // Regenerate cubes and start sorting again
     }
 
     private IEnumerator SelectionSortCoroutine()
@@ -300,4 +307,81 @@ while (cubes[i].transform.position.y < targetHeight || cubes[minIndex].transform
 
         sortingInProgress = false; // Sorting is complete
     }
+    public void DestroyPreviousCubesAndIndices()
+{
+    if (cubes != null)
+    {
+        foreach (GameObject cube in cubes)
+        {
+            Destroy(cube);
+        }
+    }
+
+    if (indexes != null)
+    {
+        foreach (GameObject index in indexes)
+        {
+            Destroy(index);
+        }
+    }
+
+    // Reset cube and index arrays
+    cubes = null;
+    indexes = null;
+}
+private void moveCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+
 }

@@ -355,10 +355,13 @@ public class CubeGenerator : MonoBehaviour
     public Camera mainCamera;
     public GameObject proAnchor;
 
+private ARPlane trackPlane;
     public TextMeshProUGUI iterationText;
     public TextMeshProUGUI infotext;
     private GameObject[] cubes;
     private GameObject[] indexes;
+    public Canvas userCanvas;
+    public Canvas exitCanvas;
     private bool sortingInProgress = false;
     private bool paused = false;
 
@@ -391,6 +394,7 @@ public class CubeGenerator : MonoBehaviour
                     infotext.text = "plane detected";
                     yield return new WaitForSeconds(10f);
                     // Plane detected, generate cubes on this plane
+                    trackPlane = arPlane;
                     GenerateCubesOnPlane(arPlane);
                     yield break; // Exit the coroutine
                 }
@@ -412,7 +416,7 @@ public class CubeGenerator : MonoBehaviour
         {
             return;
         }
-
+        DestroyPreviousCubesAndIndices();
         sortingInProgress = true;
 
         // Hide the BubbleInputCanvas
@@ -428,7 +432,8 @@ public class CubeGenerator : MonoBehaviour
         Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
         Vector3 planePosition = plane.transform.position;
         float currentX = startX;
-
+        movePPRCanvas(userCanvas,planePosition);
+        moveBackCanvas(exitCanvas,planePosition);
         cubes = new GameObject[numbers.Length];
         indexes = new GameObject[numbers.Length];
 
@@ -455,6 +460,7 @@ public class CubeGenerator : MonoBehaviour
             // Set up cube and index UI
             SetupCubeAndIndexUI(cube, index, numbers[i], i);
         }
+        
 
         // Start sorting coroutine
         StartCoroutine(BubbleSortCoroutine());
@@ -623,5 +629,67 @@ public class CubeGenerator : MonoBehaviour
         StopAllCoroutines();
         sortingInProgress = false;
         paused = false;
+        GenerateCubesOnPlane(trackPlane);
     }
+    public void DestroyPreviousCubesAndIndices()
+{
+    if (cubes != null)
+    {
+        foreach (GameObject cube in cubes)
+        {
+            Destroy(cube);
+        }
+    }
+
+    if (indexes != null)
+    {
+        foreach (GameObject index in indexes)
+        {
+            Destroy(index);
+        }
+    }
+
+    // Reset cube and index arrays
+    cubes = null;
+    indexes = null;
+}
+private void movePPRCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = -spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+private void moveBackCanvas(Canvas canvas, Vector3 position)
+{
+    if (canvas == null)
+    {
+        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
+        return;
+    }
+    float offsetX = spacing * 0.5f; 
+    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+    if (canvasRect != null)
+    {
+        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+    }
+    else
+    {
+        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
+    }
+}
+
+
+
 }
