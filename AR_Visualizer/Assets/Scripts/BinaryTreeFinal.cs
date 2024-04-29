@@ -600,6 +600,7 @@ public class BinaryTree : MonoBehaviour
     }
     private IEnumerator AddNodesWithDelay(string[] valueArray)
     {
+        yield return new WaitForSeconds(delayBetweenNodes*3);
         foreach (string value in valueArray)
         {
             int intValue;
@@ -614,8 +615,45 @@ public class BinaryTree : MonoBehaviour
         }
     }
 
+    // public void InsertNode()
+    // {
+    //     int valueToInsert;
+    //     if (int.TryParse(insertionInputField.text, out valueToInsert))
+    //     {
+    //         AddNode(valueToInsert);
+    //         PositionNodes();
+    //         UpdateNodePositions();
+    //         DrawLines();
+    //     }
+    // }
+
+    // public void DeleteNode()
+    // {
+    //     int valueToDelete;
+    //     if (int.TryParse(deletionInputField.text, out valueToDelete))
+    //     {
+    //         Debug.Log("Deleting node with value: " + valueToDelete);
+    //         DeleteNodeWithValue(valueToDelete);
+    //         PositionNodes();
+    //         UpdateNodePositions();
+    //         DrawLines();
+    //     }
+    // }
+
     public void InsertNode()
     {
+        StartCoroutine(InsertNodeWithDelay());
+    }
+
+    public void DeleteNode()
+    {
+        StartCoroutine(DeleteNodeWithDelay());
+    }
+
+    IEnumerator InsertNodeWithDelay()
+    {
+        yield return new WaitForSeconds(1f); // Adjust the delay time as needed (1 second delay in this example)
+
         int valueToInsert;
         if (int.TryParse(insertionInputField.text, out valueToInsert))
         {
@@ -626,8 +664,10 @@ public class BinaryTree : MonoBehaviour
         }
     }
 
-    public void DeleteNode()
+    IEnumerator DeleteNodeWithDelay()
     {
+        yield return new WaitForSeconds(1f); // Adjust the delay time as needed (1 second delay in this example)
+
         int valueToDelete;
         if (int.TryParse(deletionInputField.text, out valueToDelete))
         {
@@ -647,6 +687,7 @@ public class BinaryTree : MonoBehaviour
 
     private IEnumerator DoInorderTraversal(Node node)
     {
+         yield return new WaitForSeconds(delayBetweenNodes*3);
         if (node != null)
         {
             yield return StartCoroutine(DoInorderTraversal(node.left));
@@ -668,6 +709,7 @@ public class BinaryTree : MonoBehaviour
 
     private IEnumerator DoPreorderTraversal(Node node)
     {
+         yield return new WaitForSeconds(delayBetweenNodes*3);
         if (node != null)
         {
             VisitNode(node);
@@ -687,6 +729,7 @@ public class BinaryTree : MonoBehaviour
 
     private IEnumerator DoPostorderTraversal(Node node)
     {
+        yield return new WaitForSeconds(delayBetweenNodes*3);
         if (node != null)
         {
             yield return StartCoroutine(DoPostorderTraversal(node.left));
@@ -704,10 +747,12 @@ public class BinaryTree : MonoBehaviour
     {
         // Change the color of spheres and lines to green
         node.visual.GetComponent<Renderer>().material.color = Color.green;
+        /*
         foreach (GameObject line in node.lines)
         {
             line.GetComponent<LineRenderer>().material.color = Color.green;
         }
+        */
     }
 
     private void UpdateTraversalText()
@@ -950,15 +995,40 @@ public class BinaryTree : MonoBehaviour
         foreach (Node node in nodes)
         {
             node.visual.GetComponent<Renderer>().material.color = initialColor;
+            /*
             foreach (GameObject line in node.lines)
             {
                 line.GetComponent<LineRenderer>().material.color = initialColor;
             }
+            */
         }
 
         // Clear traversal text
        traversalText.text = "";
     }
+    public void DestroyObjects()
+    {
+        // Destroy node visuals and lines
+    foreach (Node node in nodes)
+    {
+        if (node.visual != null)
+        {
+            Destroy(node.visual);
+        }
+        foreach (GameObject line in node.lines)
+        {
+            Destroy(line);
+        }
+    }
+
+    // Clear the list of nodes
+    nodes.Clear();
+
+    // Reset root node
+    root = null;
+    }
+   
+
 
   
 }
