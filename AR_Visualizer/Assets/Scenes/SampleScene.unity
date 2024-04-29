@@ -29925,8 +29925,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 845395802}
-        m_TargetAssemblyTypeName: BinaryTreeFinal, Assembly-CSharp
-        m_MethodName: OnSubmitButtonClick
+        m_TargetAssemblyTypeName: BinaryTree, Assembly-CSharp
+        m_MethodName: AddNodes
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -39069,20 +39069,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccf8cbfbeb38f3144b0363ce3571e4d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arPlaneManager: {fileID: 151853166}
   nodePrefab: {fileID: 5879562266152990578, guid: c0a9c559192706d42bb8d84e80a8f707,
     type: 3}
-  verticalSpacing: 0.3
-  initialHorizontalSpacing: 10
-  horizontalSpacingDecrease: 0.5
+  verticalSpacing: 0.2
+  initialHorizontalSpacing: 0.7
+  horizontalSpacingDecrease: 0.1
   inputField: {fileID: 2045028718}
   insertionInputField: {fileID: 1319968969}
   deletionInputField: {fileID: 158190197}
   traversalText: {fileID: 297421050}
   delayBetweenNodes: 0.5
-  infotext: {fileID: 975968197}
-  traversalCanvas: {fileID: 1804739715}
-  insdelCanvas: {fileID: 2139148450}
 --- !u!114 &845395803
 MonoBehaviour:
   m_ObjectHideFlags: 0
