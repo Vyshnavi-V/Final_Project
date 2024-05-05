@@ -936,6 +936,7 @@ public class BinaryTree : MonoBehaviour
         {
             if (node.visual == null)
             {
+                
                 node.visual = Instantiate(nodePrefab, Vector3.zero, Quaternion.identity);
                 node.visual.GetComponentInChildren<TextMeshProUGUI>().text = node.value.ToString();
             }

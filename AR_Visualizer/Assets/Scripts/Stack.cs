@@ -59,13 +59,15 @@ public class Stack : MonoBehaviour
             StartCoroutine(PushProcess());
         }
     }
-
+/*
     public void OnSubmitButtonClick()
     {
 
         // Start a coroutine to wait for plane detection
         StartCoroutine(WaitForPlaneDetection());
     }
+*/
+    /*
     private IEnumerator WaitForPlaneDetection()
     {
         infotext.text = "Don't move the phone.Waiting for plane detection";
@@ -100,7 +102,7 @@ public class Stack : MonoBehaviour
         Debug.LogError("No AR planes detected within the time limit.");
         infotext.text = "No AR plane detected within 1 minute.";
     }
-
+    */
     // Coroutine for pushing process
     private IEnumerator PushProcess()
     {
@@ -126,7 +128,8 @@ public class Stack : MonoBehaviour
     // Method to generate a cube with a given number
     private void GenerateCubesOnPlane(string number)
 {
-    Vector3 planePosition = trackPlane.transform.position;
+    //Vector3 planePosition = trackPlane.transform.position;
+    Vector3 planePosition = new Vector3(-0.2f, 0f, 0.5f);
     // Set currentY to the plane's Y position
 
     // Increment currentY for the next cube
@@ -269,6 +272,20 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
     }
 }
+public void DestroyAllCubes()
+{
+    foreach (var cubePair in cubeDictionary)
+    {
+        Destroy(cubePair.Value);
+    }
+    
+    // Clear the cube dictionary
+    cubeDictionary.Clear();
+
+    // Clear the number stack
+    numberStack.Clear();
+}
+
 
 
 }

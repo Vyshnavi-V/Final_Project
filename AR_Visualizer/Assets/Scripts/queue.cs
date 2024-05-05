@@ -29,7 +29,7 @@ private float spacing = 5f;
     private float cubeSize; // Size of the cube
     private float gap = 0.005f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
-    private float currentX = 0f; // Current X position for spawning cubes
+    private float currentX = -0.2f; // Current X position for spawning cubes
     private bool isEnqueuing = false; // Flag to check if enqueuing is in progress
     private ARPlane trackPlane;
     public TextMeshProUGUI infotext;
@@ -38,6 +38,7 @@ private float spacing = 5f;
     {
         cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.x; // Get the size of the cube
     }
+    /*
 public void OnSubmitButtonClick()
     {
 
@@ -79,6 +80,7 @@ public void OnSubmitButtonClick()
         Debug.LogError("No AR planes detected within the time limit.");
         infotext.text = "No AR plane detected within 1 minute.";
     }
+    */
     // Method to enqueue numbers
     public void EnqueueNumbers()
     {
@@ -290,4 +292,21 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
     }
 }
+public void DestroyAllCubes()
+{
+    foreach (var cubePair in cubeDictionary)
+    {
+        Destroy(cubePair.Value);
+    }
+    
+    // Clear the cube dictionary
+    cubeDictionary.Clear();
+
+    // Clear the number queue
+    numberQueue.Clear();
+
+    // Reset currentX
+    currentX = -0.2f;
+}
+
 }

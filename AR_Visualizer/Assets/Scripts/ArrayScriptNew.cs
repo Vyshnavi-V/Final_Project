@@ -13,8 +13,7 @@ public class ArrayScriptNew : MonoBehaviour
     public TMP_InputField sizeInputField;
     public TMP_InputField entriesInputField; 
     public GameObject inputCanvas;
-    public GameObject insertionCanvas;
-    public GameObject deletionCanvas;
+
    // public Camera mainCamera;
     public float spacing = 2f;
     //public GameObject insertionCanvas;
@@ -38,13 +37,15 @@ public class ArrayScriptNew : MonoBehaviour
     private IEnumerator WaitForPlaneDetection()
     {
 
-        infotext.text = "Don't move the phone.Waiting for plane detection";
+        //infotext.text = "Don't move the phone.Waiting for plane detection";
         float elapsedTime = 0f;
         float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
 
         while (elapsedTime < maxWaitTime)
         {
+             GenerateCubesOnPlane();
             // Check if any planes are detected
+            /*
             foreach (var trackable in arPlaneManager.trackables)
             {
                 if (trackable is ARPlane arPlane)
@@ -57,17 +58,17 @@ public class ArrayScriptNew : MonoBehaviour
                     yield break; // Exit the coroutine
                 }
             }
-
+            */
             // No planes detected yet, wait for a short duration and check again
             yield return new WaitForSeconds(0.5f);
             elapsedTime += 0.5f;
         }
 
         // No plane detected within the time limit, display error message
-        Debug.LogError("No AR planes detected within the time limit.");
-        infotext.text = "No AR plane detected within 1 minute.";
+        //Debug.LogError("No AR planes detected within the time limit.");
+        //infotext.text = "No AR plane detected within 1 minute.";
     }
-        public void GenerateCubesOnPlane(ARPlane plane)
+        public void GenerateCubesOnPlane()
     {
         string[] entries = entriesInputField.text.Split(','); // Split the input string by commas
 
@@ -79,7 +80,7 @@ public class ArrayScriptNew : MonoBehaviour
            
         }
         DestroyCubes();
-        Vector3 planePosition = plane.transform.position;
+        Vector3 planePosition = new Vector3(-0.2f, -0.5f, 0f);
         float startX = -0.5f;
         float currentX = startX;
         
@@ -131,16 +132,6 @@ public class ArrayScriptNew : MonoBehaviour
             }
         }
         }
-        if (cubes.Count > 0)
-    {
-        // Position insertion canvas to the left of the first cube
-        Vector3 insertionCanvasPosition = cubes[0].transform.position - new Vector3(spacing, 0f, 2f);
-        insertionCanvas.transform.position = insertionCanvasPosition;
-
-        // Position deletion canvas to the right of the last cube
-        Vector3 deletionCanvasPosition = cubes[cubes.Count - 1].transform.position + new Vector3(spacing, 0f, 2f);
-        deletionCanvas.transform.position = deletionCanvasPosition;
-    }
        
     }
     // public void CreateArray()
@@ -342,6 +333,18 @@ public void DeleteValueAtIndex()
     }
 
 }
+public void DestroyAllObjects()
+{
+    // Iterate through the list of cubes and destroy each GameObject
+    foreach (GameObject cube in cubes)
+    {
+        Destroy(cube);
+    }
+
+    // Clear the list of cubes
+    cubes.Clear();
+}
+
 
 
 
