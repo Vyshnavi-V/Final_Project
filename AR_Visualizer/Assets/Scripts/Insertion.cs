@@ -9,7 +9,7 @@ public class Insertion : MonoBehaviour
         public ARPlaneManager arPlaneManager;
 
     public GameObject cubePrefab;
-    public TMP_InputField inputField;
+    public TMP_InputField InputField;
     public Button randomButton; // Reference to the button
     public float spacing = 2f;
     public Color textColor = Color.white;
@@ -17,13 +17,16 @@ public class Insertion : MonoBehaviour
     public Color sortedColor = Color.green;
     public TextMeshProUGUI actionText;
     public TextMeshProUGUI iterationText;
+    public Color indexColor = Color.black;
 
     public float sortingDelay = 1f; // Delay before starting the sorting process
     public float swapSpeed = 12f;
-      public Canvas userCanvas;
+      public Canvas infoCanvas;
     public Canvas exitCanvas;
+    public GameObject indexPrefab;
 
     private GameObject[] cubes;
+    private GameObject[] indexes;
     private bool sortingInProgress = false;
     private bool paused = false;
     public TextMeshProUGUI infotext;
@@ -42,7 +45,7 @@ public class Insertion : MonoBehaviour
             randomNumbers += Random.Range(0, 10).ToString();
             if (i < 4) randomNumbers += ",";
         }
-        inputField.text = randomNumbers;
+        InputField.text = randomNumbers;
         //GenerateCubesOnPlane();
     }
 
@@ -88,64 +91,97 @@ public class Insertion : MonoBehaviour
     }
         public void GenerateCubesOnPlane(ARPlane plane)
     {
-        string Nos = inputField.text;
-        string[] numbers = Nos.Split(',');
+        actionText.text = "This is called";
+        
+        if (sortingInProgress)
+        {
+            return;
+        }
+        
+        DestroyPreviousCubesAndIndices();
+        sortingInProgress = true;
 
+        // Hide the BubbleInputCanvas
+
+        // Destroy previous cubes and indexes
+
+        string userInput = InputField.text;
+        string[] numbers = userInput.Split(',');
+
+        // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;
         float startX = -0.5f;
+        Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
+        Vector3 planePosition = plane.transform.position;
+        //MoveCube(infoCanvas, planePosition);
+        actionText.text = "Move kazhinj";
         float currentX = startX;
-       
 
         cubes = new GameObject[numbers.Length];
-        Vector3[] cubePositions = new Vector3[numbers.Length];
-        Vector3 planePosition = plane.transform.position;
-          movePPRCanvas(userCanvas,planePosition);
-        moveBackCanvas(exitCanvas,planePosition);
+        indexes = new GameObject[numbers.Length];
 
         for (int i = 0; i < numbers.Length; i++)
         {
+            actionText.text = "Foril keri";
             Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
-            cubePositions[i] = cubePosition;
+
+            // Adjust position relative to the plane
+            Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.2f, planePosition.z + 1f); // Adjust position relative to the plane
+            actionText.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+            GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
 
-            infotext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
-
-            currentX += spacing *0.05f;
+            currentX += spacing*0.05f;
 
             cubes[i] = cube;
+            indexes[i] = index;
 
-            Canvas canvas = cube.GetComponentInChildren<Canvas>();
-            if (canvas != null)
+            // Set up cube and index UI
+            SetupCubeAndIndexUI(cube, index, numbers[i], i);
+
+        }
+         movePPRCanvas(exitCanvas,cubes[0].transform.position);
+        int n=cubes.Length;
+        moveBackCanvas(infoCanvas,cubes[n/2].transform.position);
+        // Start sorting coroutine
+        StartCoroutine(InsertionSortCoroutine());
+    }
+ private void SetupCubeAndIndexUI(GameObject cube, GameObject index, string number, int indexNumber)
+    {
+        Canvas canvas = cube.GetComponentInChildren<Canvas>();
+        Canvas indexCanvas = index.GetComponentInChildren<Canvas>();
+
+        if (canvas != null && indexCanvas != null)
+        {
+            TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI indexTextMesh = indexCanvas.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (textMesh != null && indexTextMesh != null)
             {
-                TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
-                if (textMesh != null)
-                {
-                    textMesh.text = numbers[i];
-                    textMesh.color = textColor;
-                    textMesh.alignment = TextAlignmentOptions.Center;
+                textMesh.text = number;
+                textMesh.color = textColor;
+                textMesh.alignment = TextAlignmentOptions.Center;
 
-                    float cubeSize = 24.2f;
-                    float fontSizeMultiplier = 4f;
-                    textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
-                }
-                else
-                {
-                    Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube prefab.");
-                }
+                indexTextMesh.text = indexNumber.ToString();
+                indexTextMesh.color = indexColor;
+                indexTextMesh.alignment = TextAlignmentOptions.Center;
+
+                float cubeSize = 24.2f;
+                float fontSizeMultiplier = 4f;
+                textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
+                indexTextMesh.fontSize = Mathf.RoundToInt(cubeSize * 10f);
             }
             else
             {
-                Debug.LogError("Canvas component not found in the children of the cube prefab.");
+                Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube or index prefab.");
             }
         }
-        int startIndex = 0;
-        int length = cubes.Length;
-        int midpointIndex = startIndex + length / 2;
-
-        // Divide the array into left and right halves
-       
-        StartCoroutine(InsertionSortCoroutine());
+        else
+        {
+            Debug.LogError("Canvas component not found in the children of the cube or index prefab.");
+        }
     }
+
 
     public void ReplaySorting()
     {
@@ -165,6 +201,29 @@ public class Insertion : MonoBehaviour
         paused = false;
     }
 
+public void DestroyPreviousCubesAndIndices()
+{
+    if (cubes != null)
+    {
+        foreach (GameObject cube in cubes)
+        {
+            Destroy(cube);
+        }
+    }
+
+    if (indexes != null)
+    {
+        foreach (GameObject index in indexes)
+        {
+            Destroy(index);
+        }
+    }
+
+    // Reset cube and index arrays
+    cubes = null;
+    indexes = null;
+    sortingInProgress = false;
+}
     private IEnumerator InsertionSortCoroutine()
 {
     yield return new WaitForSeconds(sortingDelay);
@@ -204,7 +263,7 @@ public class Insertion : MonoBehaviour
 
         // Change color of the current key cube
         cubes[i].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
-
+        float originalY = cubes[0].transform.position.y;
         while (j >= 0 && int.Parse(cubes[j].GetComponentInChildren<TextMeshProUGUI>().text) > key)
         {
             // Change color of the cubes being compared
@@ -219,10 +278,10 @@ public class Insertion : MonoBehaviour
              }
             // Move cubes up
             float cubeHeight = cubes[j + 1].GetComponent<Renderer>().bounds.size.y;
-            while (cubes[j + 1].transform.position.y < cubeHeight || cubes[j].transform.position.y < cubeHeight)
+            while (cubes[j + 1].transform.position.y < cubeHeight*0.5f || cubes[j].transform.position.y < cubeHeight*0.5f)
             {
-                cubes[j + 1].transform.position = Vector3.MoveTowards(cubes[j + 1].transform.position, new Vector3(cubes[j + 1].transform.position.x, cubeHeight, cubes[j + 1].transform.position.z), Time.deltaTime * swapSpeed);
-                cubes[j].transform.position = Vector3.MoveTowards(cubes[j].transform.position, new Vector3(cubes[j].transform.position.x, cubeHeight, cubes[j].transform.position.z), Time.deltaTime * swapSpeed);
+                cubes[j + 1].transform.position = Vector3.MoveTowards(cubes[j + 1].transform.position, new Vector3(cubes[j + 1].transform.position.x, cubeHeight*0.5f, cubes[j + 1].transform.position.z), Time.deltaTime * swapSpeed);
+                cubes[j].transform.position = Vector3.MoveTowards(cubes[j].transform.position, new Vector3(cubes[j].transform.position.x, cubeHeight*0.5f, cubes[j].transform.position.z), Time.deltaTime * swapSpeed);
                 actionText.text = "Inserting " + int.Parse(cubes[j + 1].GetComponentInChildren<TextMeshProUGUI>().text) +" and shifting " + int.Parse(cubes[j].GetComponentInChildren<TextMeshProUGUI>().text) + " to the right";
                 yield return null;
             }
@@ -239,12 +298,12 @@ public class Insertion : MonoBehaviour
                 actionText.text = "Inserting " + int.Parse(cubes[j + 1].GetComponentInChildren<TextMeshProUGUI>().text) +" and shifting " + int.Parse(cubes[j].GetComponentInChildren<TextMeshProUGUI>().text) + " to the right";
                 yield return null;
             }
-
+            
             // Move cubes down
-            while (cubes[j + 1].transform.position.y > 0f || cubes[j].transform.position.y > 0f)
+            while (cubes[j + 1].transform.position.y > originalY || cubes[j].transform.position.y > originalY)
             {
-                cubes[j + 1].transform.position = Vector3.MoveTowards(cubes[j + 1].transform.position, new Vector3(cubes[j + 1].transform.position.x, 0f, cubes[j + 1].transform.position.z), Time.deltaTime * swapSpeed);
-                cubes[j].transform.position = Vector3.MoveTowards(cubes[j].transform.position, new Vector3(cubes[j].transform.position.x, 0f, cubes[j].transform.position.z), Time.deltaTime * swapSpeed);
+                cubes[j + 1].transform.position = Vector3.MoveTowards(cubes[j + 1].transform.position, new Vector3(cubes[j + 1].transform.position.x, originalY, cubes[j + 1].transform.position.z), Time.deltaTime * swapSpeed);
+                cubes[j].transform.position = Vector3.MoveTowards(cubes[j].transform.position, new Vector3(cubes[j].transform.position.x, originalY, cubes[j].transform.position.z), Time.deltaTime * swapSpeed);
                actionText.text = "Inserting " + int.Parse(cubes[j + 1].GetComponentInChildren<TextMeshProUGUI>().text) +" and shifting " + int.Parse(cubes[j].GetComponentInChildren<TextMeshProUGUI>().text) + " to the right";
                 yield return null;
             }
@@ -314,23 +373,6 @@ public class Insertion : MonoBehaviour
     iterationText.text = "Sorting Completed"; // Update iteration text after sorting completion
 
     sortingInProgress = false; // Sorting is complete
-}    private void moveCanvas(Canvas canvas, Vector3 position)
-{
-    if (canvas == null)
-    {
-        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
-        return;
-    }
-    float offsetX = -spacing * 0.5f; 
-    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
-    if (canvasRect != null)
-    {
-        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
-    }
-    else
-    {
-        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
-    }
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)
 {
@@ -339,7 +381,7 @@ private void movePPRCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = -spacing * 0.5f; 
+    float offsetX = -spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
@@ -357,33 +399,17 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = spacing * 0.5f; 
+    float offsetY = spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
-        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+        canvasRect.anchoredPosition3D = position + new Vector3(0f, offsetY, 0f);
     }
     else
     {
         Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
     }
 }
-private void moveInfoCanvas(Canvas canvas, Vector3 position)
-{
-    if (canvas == null)
-    {
-        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
-        return;
-    }
-    float offsetY = spacing * 0.5f; 
-    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
-    if (canvasRect != null)
-    {
-        canvasRect.anchoredPosition3D = position + new Vector3(0f,offsetY , 0f);
-    }
-    else
-    {
-        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
-    }
-}
+
+
 }

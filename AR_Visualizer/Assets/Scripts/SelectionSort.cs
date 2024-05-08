@@ -20,15 +20,14 @@ public class SelectionSort : MonoBehaviour
     public GameObject indexPrefab;
     public Color indexColor = Color.black;
     public float scaleFactor;
-     public Canvas userCanvas;
-    public Canvas exitCanvas;
+     public Canvas exitCanvas;
 
     private GameObject[] cubes;
     private bool sortingInProgress = false;
     private bool paused = false;
     public TextMeshProUGUI iterationText;
      public TextMeshProUGUI actiontext;
-    public GameObject infoCanvas;
+    public Canvas infoCanvas;
     private GameObject[] indexes;
     private ARPlane trackPlane;
 
@@ -118,8 +117,6 @@ public void OnSubmitButtonClick()
         //MoveCube(infoCanvas, planePosition);
         actiontext.text = "Move kazhinj";
         float currentX = startX;
-         movePPRCanvas(userCanvas,planePosition);
-        moveBackCanvas(exitCanvas,planePosition);
 
         cubes = new GameObject[numbers.Length];
         indexes = new GameObject[numbers.Length];
@@ -130,7 +127,7 @@ public void OnSubmitButtonClick()
             Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
 
             // Adjust position relative to the plane
-            Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y, planePosition.z + 1f); // Adjust position relative to the plane
+            Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.2f, planePosition.z + 1f); // Adjust position relative to the plane
             actiontext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
@@ -144,7 +141,9 @@ public void OnSubmitButtonClick()
             SetupCubeAndIndexUI(cube, index, numbers[i], i);
 
         }
-
+         movePPRCanvas(exitCanvas,cubes[0].transform.position);
+        int n=cubes.Length;
+        moveBackCanvas(infoCanvas,cubes[n/2].transform.position);
         // Start sorting coroutine
         StartCoroutine(SelectionSortCoroutine());
     }
@@ -284,30 +283,40 @@ public void OnSubmitButtonClick()
         // Swap the found minimum element with the first element
         Vector3 tempPosition = cubes[i].transform.position;
         Vector3 newPosition = cubes[minIndex].transform.position;
-        // Move cubes up
-        float cubeHeight = cubes[i].GetComponent<Renderer>().bounds.size.y;
-        while (cubes[i].transform.position.y < cubeHeight || cubes[minIndex].transform.position.y < cubeHeight)
-        {
-            cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(cubes[i].transform.position.x, cubeHeight, cubes[i].transform.position.z), Time.deltaTime * swapSpeed);
-            cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(cubes[minIndex].transform.position.x, cubeHeight, cubes[minIndex].transform.position.z), Time.deltaTime * swapSpeed);
-            yield return null;
-        }
+        float originalY = tempPosition.y;
+    
 
-        // Move cubes horizontally
-        while (cubes[i].transform.position.x != newPosition.x || cubes[minIndex].transform.position.x != tempPosition.x)
-        {
-            cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(newPosition.x, cubes[i].transform.position.y, newPosition.z), Time.deltaTime * swapSpeed);
-            cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(tempPosition.x, cubes[minIndex].transform.position.y, tempPosition.z), Time.deltaTime * swapSpeed);
-            yield return null;
-        }
+// Move cubes up
+float cubeHeight = cubes[i].GetComponent<Renderer>().bounds.size.y;
+actiontext.text = "CubeHeight "+cubeHeight;
+// Define a new variable for half the cube height
+float halfCubeHeight = cubeHeight * 0.9f;
 
-        // Move cubes down
-        while (cubes[i].transform.position.y > 0f || cubes[minIndex].transform.position.y > 0f)
-        {
-            cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(cubes[i].transform.position.x, 0f, cubes[i].transform.position.z), Time.deltaTime * swapSpeed);
-            cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(cubes[minIndex].transform.position.x, 0f, cubes[minIndex].transform.position.z), Time.deltaTime * swapSpeed);
-            yield return null;
-        }
+// Move cubes up to half the distance
+while (cubes[i].transform.position.y < halfCubeHeight || cubes[minIndex].transform.position.y < halfCubeHeight)
+{
+    cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(cubes[i].transform.position.x, halfCubeHeight, cubes[i].transform.position.z), Time.deltaTime * swapSpeed);
+    cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(cubes[minIndex].transform.position.x, halfCubeHeight, cubes[minIndex].transform.position.z), Time.deltaTime * swapSpeed);
+    yield return null;
+}
+
+// Move cubes horizontally
+while (cubes[i].transform.position.x != newPosition.x || cubes[minIndex].transform.position.x != tempPosition.x)
+{
+    cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(newPosition.x, halfCubeHeight , newPosition.z), Time.deltaTime * swapSpeed);
+    cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(tempPosition.x, halfCubeHeight , tempPosition.z), Time.deltaTime * swapSpeed);
+    yield return null;
+}
+
+// Move cubes down to original Y position
+while (cubes[i].transform.position.y > originalY || cubes[minIndex].transform.position.y > originalY)
+{
+    cubes[i].transform.position = Vector3.MoveTowards(cubes[i].transform.position, new Vector3(cubes[i].transform.position.x, originalY, cubes[i].transform.position.z), Time.deltaTime * swapSpeed);
+    cubes[minIndex].transform.position = Vector3.MoveTowards(cubes[minIndex].transform.position, new Vector3(cubes[minIndex].transform.position.x, originalY, cubes[minIndex].transform.position.z), Time.deltaTime * swapSpeed);
+    yield return null;
+}
+
+
         GameObject tempCube = cubes[i];
         cubes[i] = cubes[minIndex];
         cubes[minIndex] = tempCube;
@@ -354,24 +363,7 @@ public void OnSubmitButtonClick()
     // Reset cube and index arrays
     cubes = null;
     indexes = null;
-}
-private void moveCanvas(Canvas canvas, Vector3 position)
-{
-    if (canvas == null)
-    {
-        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
-        return;
-    }
-    float offsetX = -spacing * 0.5f; 
-    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
-    if (canvasRect != null)
-    {
-        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
-    }
-    else
-    {
-        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
-    }
+     
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)
 {
@@ -380,7 +372,7 @@ private void movePPRCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = -spacing * 0.5f; 
+    float offsetX = -spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
@@ -398,16 +390,17 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = spacing * 0.5f; 
+    float offsetY = spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
-        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+        canvasRect.anchoredPosition3D = position + new Vector3(0f, offsetY, 0f);
     }
     else
     {
         Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
     }
 }
+
 
 }

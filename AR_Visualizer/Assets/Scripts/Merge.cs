@@ -21,11 +21,10 @@ public class Merge : MonoBehaviour
     public GameObject linePrefab;
     public float divisionDelay = 2f; // Delay between each division
     public Material lineMaterial; // Material for the line renderer
-    public TextMeshProUGUI infotext;
+    public TextMeshProUGUI actiontext;
     public TextMeshProUGUI infoText;
-    public Canvas userCanvas;
     public Canvas exitCanvas;
-     public Canvas infoCanvas;
+    public Canvas infoCanvas;
 
 
     private GameObject[] cubes;
@@ -53,7 +52,7 @@ public class Merge : MonoBehaviour
     private IEnumerator WaitForPlaneDetection()
     {
 
-        infotext.text = "Don't move the phone.Waiting for plane detection";
+        actiontext.text = "Don't move the phone.Waiting for plane detection";
         float elapsedTime = 0f;
         float maxWaitTime = 60f; // Maximum wait time in seconds (1 minute)
 
@@ -64,7 +63,7 @@ public class Merge : MonoBehaviour
             {
                 if (trackable is ARPlane arPlane)
                 {
-                    infotext.text = "plane detected";
+                    actiontext.text = "plane detected";
                     Debug.LogError("No AR planes detected .");
                     yield return new WaitForSeconds(2f);
                     // Plane detected, generate cubes on this plane
@@ -80,7 +79,7 @@ public class Merge : MonoBehaviour
 
         // No plane detected within the time limit, display error message
         Debug.LogError("No AR planes detected within the time limit.");
-        infotext.text = "No AR plane detected within 1 minute.";
+        actiontext.text = "No AR plane detected within 1 minute.";
     }
         public void GenerateCubesOnPlane(ARPlane plane)
     {
@@ -112,12 +111,10 @@ public class Merge : MonoBehaviour
             cubePositions[i] = cubePosition;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
-            infotext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
+            actiontext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
 
             currentX += spacing *0.05f;
             //movePPRCanvas(userCanvas,planePosition);
-            moveBackCanvas(exitCanvas,planePosition);
-            moveInfoCanvas(infoCanvas,planePosition);
             
 
             cubes[i] = cube;
@@ -146,6 +143,9 @@ public class Merge : MonoBehaviour
                 Debug.LogError("Canvas component not found in the children of the cube prefab.");
             }
         }
+        movePPRCanvas(exitCanvas,cubes[0].transform.position);
+        int n=cubes.Length;
+        moveBackCanvas(infoCanvas,cubes[n/2].transform.position);
         int startIndex = 0;
         int length = cubes.Length;
         int midpointIndex = startIndex + length / 2;
@@ -154,12 +154,15 @@ public class Merge : MonoBehaviour
         GameObject[] leftHalf = cubes.Take(midpointIndex).ToArray();
         GameObject[] rightHalf = cubes.Skip(midpointIndex).ToArray();
         divisionPositions.Add(cubePositions);
-        infotext.text = "Divide Cheyan Povane";
+        actiontext.text = "Division";
         // Start recursive division with delay
         StartCoroutine(DivideCubesWithDelay(cubes));
     }
     private IEnumerator DivideCubesWithDelay(GameObject[] cubesToDivide)
     {
+        if(cubesToDivide.Length == 1){
+            infoText.text = "Divide(" + cubesToDivide[0] + ")";
+        }
         infoText.text = "Merge Sort uses Divide and Conquer Strategy";
         yield return new WaitForSeconds(sortingDelay);
 
@@ -370,6 +373,7 @@ public class Merge : MonoBehaviour
     {
         yield return new WaitForSeconds(divisionDelay); // Add a delay before starting merging
 
+        actiontext.text = "Merging";
         yield return StartCoroutine(MergeCubesRecursive(sortedCubes, 0, cubes.Take(cubes.Length / 2).ToArray(), cubes.Skip(cubes.Length / 2).ToArray())); // Start merging recursively
         Debug.Log("Merging completed!");
     }
@@ -763,7 +767,7 @@ public class Merge : MonoBehaviour
             int value2Cube2 = int.Parse(cube2.GetComponentInChildren<TextMeshProUGUI>().text);
             int value1Cube3 = int.Parse(cube3.GetComponentInChildren<TextMeshProUGUI>().text);
             int value2Cube4 = int.Parse(cube4.GetComponentInChildren<TextMeshProUGUI>().text);
-            infoText.text = value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3 + " ," + value2Cube4;
+            infoText.text = "Merge("+ value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3 + " ," + value2Cube4+")";
             Debug.Log(value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3 + " ," + value2Cube4);
             Vector3 cube1Position = cube1.transform.position;
             Vector3 cube2Position = cube2.transform.position;
@@ -912,7 +916,7 @@ public class Merge : MonoBehaviour
             int value1Cube1 = int.Parse(cube1.GetComponentInChildren<TextMeshProUGUI>().text);
             int value2Cube2 = int.Parse(cube2.GetComponentInChildren<TextMeshProUGUI>().text);
             int value1Cube3 = int.Parse(cube3.GetComponentInChildren<TextMeshProUGUI>().text);
-            infoText.text = value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3;
+            infoText.text = "Merge("+value1Cube1 + ", " + value2Cube2 + " ," + value1Cube3+")";
             Debug.Log(value1Cube1 + " " + value2Cube2 + " " + value1Cube3);
             Vector3 cube1Position = cube1.transform.position;
             Vector3 cube2Position = cube1.transform.position + Vector3.right * 4f * small;
@@ -1034,7 +1038,11 @@ public class Merge : MonoBehaviour
             Debug.Log("Sorted_Right" + sortedAndGroupedRight[i].GetComponentInChildren<TextMeshProUGUI>().text);
         }
         */
+        string leftSortedHalves = string.Join(", ", sortedAndGroupedLeft.Select(cube => cube.GetComponentInChildren<TextMeshProUGUI>().text));
 
+    // Construct string for right sorted halves
+    string rightSortedHalves = string.Join(", ", sortedAndGroupedRight.Select(cube => cube.GetComponentInChildren<TextMeshProUGUI>().text));
+    infoText.text ="Merge("+ leftSortedHalves +","+rightSortedHalves+")";
         int leftIndex = 0;
         int rightIndex = 0;
         float yOffset = -0.07f * spacing; // Adjust this value as needed for the desired spacing between rows
@@ -1266,7 +1274,7 @@ private void movePPRCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = -spacing * 0.5f; 
+    float offsetX = -spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
@@ -1284,25 +1292,7 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = spacing * 0.5f; 
-    RectTransform canvasRect = canvas.GetComponent<RectTransform>();
-    if (canvasRect != null)
-    {
-        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
-    }
-    else
-    {
-        Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
-    }
-}
-private void moveInfoCanvas(Canvas canvas, Vector3 position)
-{
-    if (canvas == null)
-    {
-        Debug.LogError("Canvas parameter is null. Cannot move canvas.");
-        return;
-    }
-    float offsetY = spacing * 0.5f; 
+    float offsetY = spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
@@ -1313,6 +1303,8 @@ private void moveInfoCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
     }
 }
+
+
 }
  // public void CreateArray()
     // {
@@ -1372,5 +1364,3 @@ private void moveInfoCanvas(Canvas canvas, Vector3 position)
     //    // FocusCameraOnCubes();
     // }
 
-
-    

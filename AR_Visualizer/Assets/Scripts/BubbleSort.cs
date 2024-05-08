@@ -361,6 +361,7 @@ private ARPlane trackPlane;
     private GameObject[] cubes;
     private GameObject[] indexes;
     public Canvas exitCanvas;
+    public Canvas infoCanvas;
     private bool sortingInProgress = false;
     private bool paused = false;
 
@@ -441,9 +442,10 @@ private ARPlane trackPlane;
         for (int i = 0; i < numbers.Length; i++)
         {
             Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y + 0.5f, planePosition.z + 1f);
+             Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.2f, planePosition.z + 1f);
 
             // Adjust position relative to the plane
-            Vector3 indexPosition = plane.transform.position + new Vector3(currentX, -100f, 0f); // Adjust position relative to the plane
+            // Adjust position relative to the plane
             actiontext.text = "plane" + " " + planePosition + " " + "cube" + " " + cubePosition;
 
             // Instantiate cube as a child of proAnchor
@@ -460,6 +462,8 @@ private ARPlane trackPlane;
         }
         
         movePPRCanvas(exitCanvas,cubes[0].transform.position);
+        int n=cubes.Length;
+        moveBackCanvas(infoCanvas,cubes[n/2].transform.position);
         // Start sorting coroutine
         StartCoroutine(BubbleSortCoroutine());
     }
@@ -557,66 +561,67 @@ private ARPlane trackPlane;
     yield return new WaitForSeconds(sortingDelay);
 
     int n = cubes.Length;
-    //bool swapped;
+    bool swapped;
 
-    for (int i = 1; i < n ; i++)
+    for (int i = 0; i < n - 1; i++)
     {
         iterationText.text = "Iteration: " + (i + 1);
         actiontext.text = "Sorting iteration " + (i + 1);
 
-        //swapped = false;
-        for (int j = 1; j < n ; j++)
+        swapped = false;
+        for (int j = 0; j < n - i - 1; j++)
         {
             // Change color of cubes being compared
             cubes[j].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
-            cubes[j -1].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
+            cubes[j + 1].GetComponentInChildren<TextMeshProUGUI>().color = comparisonColor;
 
             // Compare adjacent cubes
             int currentValue = int.Parse(cubes[j].GetComponentInChildren<TextMeshProUGUI>().text);
-            int previousValue = int.Parse(cubes[j - 1].GetComponentInChildren<TextMeshProUGUI>().text);
+            int nextValue = int.Parse(cubes[j + 1].GetComponentInChildren<TextMeshProUGUI>().text);
 
-
-            actiontext.text = "Comparing " + currentValue + " and " + previousValue;
+            actiontext.text = "Comparing " + currentValue + " and " + nextValue;
 
             // Display the result of the comparison
-            if (currentValue < previousValue)
+            if (currentValue < nextValue)
             {
-                actiontext.text += " : " + currentValue + " < " + previousValue;
+                actiontext.text += " : " + currentValue + " < " + nextValue;
             }
-            else if (currentValue > previousValue)
+            else if (currentValue > nextValue)
             {
-                actiontext.text += " : " + currentValue + " > " + previousValue;
+                actiontext.text += " : " + currentValue + " > " + nextValue;
             }
             else
             {
-                actiontext.text += " : " + currentValue + " = " + previousValue;
+                actiontext.text += " : " + currentValue + " = " + nextValue;
             }
 
             yield return new WaitForSeconds(2f); // Delay after comparing
 
-            if (currentValue <previousValue)
+            if (currentValue > nextValue)
             {
                 // Lift and swap cubes
                 Vector3 tempPosition = cubes[j].transform.position;
-                Vector3 newPosition = cubes[j - 1].transform.position;
+                Vector3 newPosition = cubes[j + 1].transform.position;
+
+                
 
                 while (cubes[j].transform.position != newPosition)
                 {
                     cubes[j].transform.position = Vector3.MoveTowards(cubes[j].transform.position, newPosition, Time.deltaTime * swapSpeed);
-                    cubes[j-1].transform.position = Vector3.MoveTowards(cubes[j - 1].transform.position, tempPosition, Time.deltaTime * swapSpeed);
+                    cubes[j + 1].transform.position = Vector3.MoveTowards(cubes[j + 1].transform.position, tempPosition, Time.deltaTime * swapSpeed);
 
                     // Update action text to show swapping
-                    actiontext.text = "Swapping " + previousValue + " and " + currentValue;
+                    actiontext.text = "Swapping " + currentValue + " and " + nextValue;
 
                     yield return null;
                 }
 
                 // Swap cube references
                 GameObject tempCube = cubes[j];
-                cubes[j] = cubes[j -1];
-                cubes[j -1] = tempCube;
+                cubes[j] = cubes[j + 1];
+                cubes[j + 1] = tempCube;
 
-                //swapped = true;
+                swapped = true;
             }
             else
             {
@@ -625,7 +630,7 @@ private ARPlane trackPlane;
 
             // Reset color after comparison
             cubes[j].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
-            cubes[j - 1].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
+            cubes[j + 1].GetComponentInChildren<TextMeshProUGUI>().color = textColor;
 
             if (paused)
             {
@@ -636,12 +641,13 @@ private ARPlane trackPlane;
         }
 
         // Display the sorted element and change its color to green
-        cubes[n - i ].GetComponentInChildren<TextMeshProUGUI>().color = Color.green;
-        actiontext.text = "Element " + cubes[n - i ].GetComponentInChildren<TextMeshProUGUI>().text + " is sorted";
+        cubes[n - i - 1].GetComponentInChildren<TextMeshProUGUI>().color = Color.green;
+        actiontext.text = "Element " + cubes[n - i - 1].GetComponentInChildren<TextMeshProUGUI>().text + " is sorted";
 
-       
-        n--;
-
+       // if (!swapped)
+       // {
+       //     break; // If no swaps were made, the array is already sorted
+       // }
     }
 
     // Change the color of the first element to green after sorting is completed
@@ -692,6 +698,7 @@ private ARPlane trackPlane;
     // Reset cube and index arrays
     cubes = null;
     indexes = null;
+    sortingInProgress = false;
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)
 {
@@ -700,7 +707,7 @@ private void movePPRCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = -spacing * 0.05f; 
+    float offsetX = -spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
@@ -718,11 +725,11 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = spacing * 0.5f; 
+    float offsetY = spacing * 0.07f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
-        canvasRect.anchoredPosition3D = position + new Vector3(offsetX, 0f, 0f);
+        canvasRect.anchoredPosition3D = position + new Vector3(0f, offsetY, 0f);
     }
     else
     {

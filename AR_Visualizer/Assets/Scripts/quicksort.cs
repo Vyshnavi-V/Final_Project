@@ -15,11 +15,11 @@ public class Quicksort : MonoBehaviour
     public GameObject inputCanvas;
     public Button randomButton;
     public Camera mainCamera;
-    public float spacing = 2f;
+    public float spacing = 0.2f;
     public Color textColor = Color.black;
     public Color comparisonColor = Color.yellow;
     public float sortingDelay = 1f;
-    public float swapSpeed = 3f;
+    public float swapSpeed = 1f;
 
     public TextMeshProUGUI lowText;
     public TextMeshProUGUI highText;
@@ -154,36 +154,15 @@ public class Quicksort : MonoBehaviour
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            Vector3 cubePosition = new Vector3(planePosition.x+currentX, 0f, 0f);
+            Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
             currentX += spacing*0.05f;
 
             initialCubes.Add(cube);
-
-            Canvas canvas = cube.GetComponentInChildren<Canvas>();
-            if (canvas != null)
-            {
-                TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
-                if (textMesh != null)
-                {
-                    textMesh.text = numbers[i];
-                    textMesh.color = textColor;
-                    textMesh.alignment = TextAlignmentOptions.Center;
-                     float cubeSize = 24.2f;
-                float fontSizeMultiplier = 4f;
-                textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
-                }
-                else
-                {
-                    Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube prefab.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Canvas component not found in the children of the cube prefab.");
-            }
+            SetupCubeAndIndexUI(cube,numbers[i], i);
+            
         }
 
         generatedCubes.Add(initialCubes);
@@ -234,6 +213,34 @@ public class Quicksort : MonoBehaviour
     //     StartCoroutine(QuicksortCoroutine(0, generatedCubes[0].Count - 1, 0));
     // }
 
+private void SetupCubeAndIndexUI(GameObject cube, string number, int indexNumber)
+    {
+        Canvas canvas = cube.GetComponentInChildren<Canvas>();
+
+        if (canvas != null)
+        {
+            TextMeshProUGUI textMesh = canvas.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (textMesh != null)
+            {
+                textMesh.text = number;
+                textMesh.color = textColor;
+                textMesh.alignment = TextAlignmentOptions.Center;
+
+                float cubeSize = 24.2f;
+                float fontSizeMultiplier = 4f;
+                textMesh.fontSize = Mathf.RoundToInt(cubeSize * fontSizeMultiplier);
+            }
+            else
+            {
+                Debug.LogError("TextMeshProUGUI component not found in the canvas of the cube or index prefab.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Canvas component not found in the children of the cube or index prefab.");
+        }
+    }
     private void FocusCameraOnCubes()
     {
         if (generatedCubes.Count > 0 && mainCamera != null)
@@ -341,6 +348,7 @@ public class Quicksort : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         float cubeHeight = cube1.GetComponent<Renderer>().bounds.size.y;
+        cubeHeight = cubeHeight*0.8f;
         float startTime = Time.time;
         while (Time.time - startTime < swapDuration)
         {
@@ -481,7 +489,7 @@ private void DisableText(TextMeshProUGUI textObject)
     private void VisualizePartition(int low, int high, int level)
     {
         List<GameObject> clonedCubes = new List<GameObject>();
-        float yOffset = -0.07f * (generatedCubes.Count - level);
+        float yOffset = -0.5f * (generatedCubes.Count - level);
 
         for (int i = 0; i < generatedCubes[level].Count; i++)
         {
