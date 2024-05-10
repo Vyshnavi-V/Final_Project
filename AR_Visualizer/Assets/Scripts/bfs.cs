@@ -7,7 +7,7 @@ public class Bfs : MonoBehaviour
 {
     public GameObject lineParent;
     public GameObject sphereParent;
-    public GameObject orderCanvas;
+    //public GameObject orderCanvas;
     public GameObject cubePrefab; // Cube prefab for queue visualization
     public float cubeDelay = 0.5f; // Delay between cube generation
     public float squareDelayBetweenChanges = 1f; // Delay between square color changes
@@ -16,16 +16,19 @@ public class Bfs : MonoBehaviour
 
     private List<Transform> squares = new List<Transform>();
     private List<Transform> spheres = new List<Transform>();
-    private TextMeshProUGUI orderText;
+    public TextMeshProUGUI orderText;
+    public TextMeshProUGUI actionText;
     private Queue<string> numberQueue = new Queue<string>(); // Queue to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = -10f; // Gap between cubes
+    private float gap = 0.01f; // Gap between cubes
     private float currentX = 0f; // Current X position for spawning cubes
     private bool isDequeueing = false; // Flag to check if dequeueing is in progress
 
     void Start()
 {
+    actionText.text ="";
+    orderText.text ="Node Order:";
     // Get all squares within the lineParent
     foreach (Transform child in lineParent.transform)
     {
@@ -39,7 +42,7 @@ public class Bfs : MonoBehaviour
     }
 
     // Get the TextMeshProUGUI component from the orderCanvas
-    orderText = orderCanvas.GetComponentInChildren<TextMeshProUGUI>();
+    //orderText = orderCanvas.GetComponentInChildren<TextMeshProUGUI>();
 
     // Start the color change coroutine for squares
     StartCoroutine(ChangeSquareColors());
@@ -60,9 +63,9 @@ public class Bfs : MonoBehaviour
         foreach (Transform square in squares)
         {
             string squareName = square.name;
-            if (squareName != "Line 11" && squareName != "Line 12")
+            if (squareName != "Line 10" && squareName != "Line 11")
             {
-                square.GetComponent<Renderer>().material.color = Color.green; // Change square color
+                square.GetComponent<Renderer>().material.color = Color.blue; // Change square color
             }
             yield return new WaitForSeconds(squareDelayBetweenChanges);
         }
@@ -76,7 +79,7 @@ public class Bfs : MonoBehaviour
         // Iterate through spheres and change color with delay
         foreach (Transform sphere in spheres)
         {
-            sphere.GetComponent<Renderer>().material.color = Color.yellow; // Change sphere color
+            sphere.GetComponent<Renderer>().material.color = Color.green; // Change sphere color
 
             // Get the Text component from the sphere's canvas
             TextMeshProUGUI sphereText = sphere.GetComponentInChildren<TextMeshProUGUI>();
@@ -101,93 +104,115 @@ public class Bfs : MonoBehaviour
     {
         // Enqueue 0
         EnqueueNumber("0");
-        yield return new WaitForSeconds(cubeDelay);
+        actionText.text = "We enqueue the node 0 into the queue";
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 0
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(3.5f);
+        actionText.text = "Dequeue node 0 and enqueue the children of node 0 --> node 1 and node 2";
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(0.5f);
 
         // Enqueue 1
         EnqueueNumber("1");
-        yield return new WaitForSeconds(cubeDelay);
-
+        yield return new WaitForSeconds(4f);
         // Enqueue 2
         EnqueueNumber("2");
-        yield return new WaitForSeconds(cubeDelay);
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 1
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(3.5f);
+        actionText.text = "Dequeue node 1 and enqueue the children of node 1 --> node 3 and node 4";
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(0.5f);
 
         // Enqueue 3
         EnqueueNumber("3");
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(4f);
 
         // Enqueue 4
         EnqueueNumber("4");
-        yield return new WaitForSeconds(cubeDelay);
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 2
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(3.5f);
+        actionText.text = "Dequeue node 2 and enqueue the children of node 2 --> no children";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(1.5f);
 
         // Dequeue 3
-        yield return new WaitForSeconds(dequeueDelay);
+        //yield return new WaitForSeconds(dequeueDelay);
+        actionText.text = "Dequeue node 3 and enqueue the children of node 3 --> node 5";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(0.5f);
 
         // Enqueue 5
+
         EnqueueNumber("5");
-        yield return new WaitForSeconds(cubeDelay);
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 4
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(3.5f);
+        actionText.text = "Dequeue node 4 and enqueue the children of node 4 --> no children";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(1.5f);
 
         // Dequeue 5
-        yield return new WaitForSeconds(dequeueDelay);
+        //yield return new WaitForSeconds(dequeueDelay);
+        actionText.text = "Dequeue node 5 and enqueue the children of node 5 --> node 6,node 7 and node 8";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(0.5f);
 
         // Enqueue 6
+
         EnqueueNumber("6");
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(4f);
 
         // Enqueue 7
         EnqueueNumber("7");
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(4f);
 
         // Enqueue 8
         EnqueueNumber("8");
-        yield return new WaitForSeconds(cubeDelay);
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 6
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(3.5f);
+        actionText.text = "Dequeue node 6 and enqueue the children of node 6 --> no children";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(1.5f);
 
         // Dequeue 7
-        yield return new WaitForSeconds(dequeueDelay);
+                actionText.text = "Dequeue node 7 and enqueue the children of node 7 --> no children";
+
+        //yield return new WaitForSeconds(dequeueDelay);
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 8
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(1.5f);
+                actionText.text = "Dequeue node 8 and enqueue the children of node 8 --> node 9";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(0.2f);
 
         // Enqueue 9
         EnqueueNumber("9");
-        yield return new WaitForSeconds(cubeDelay);
+        //yield return new WaitForSeconds(cubeDelay);
 
         // Dequeue 9
-        yield return new WaitForSeconds(dequeueDelay);
+        yield return new WaitForSeconds(3.5f);
+                        actionText.text = "Dequeue node 9 and add the children of node 9 --> no children";
+
         DequeueNumber();
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(3f);
+        actionText.text = "BFS completed and the order is given above";
+
 
         
     }
@@ -232,8 +257,8 @@ public class Bfs : MonoBehaviour
     currentX += cubeSize + gap; // Adding a small gap between cubes
 
     // Calculate the final position of the cube, slightly to the left
-    float xOffset = -40f; // Adjust as needed
-    Vector3 finalPosition = new Vector3(currentX + xOffset, -80f, 0f);
+    float xOffset = -0.2f; // Adjust as needed
+    Vector3 finalPosition = new Vector3(currentX + xOffset, 0.192f, 0.5f);
 
     // Start the coroutine to move the cube to its final position
     StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));
@@ -243,7 +268,7 @@ public class Bfs : MonoBehaviour
     IEnumerator MoveCubeToPosition(GameObject cube, Vector3 finalPosition, string number)
     {
         // Instantiate the cube at an initial position far to the right
-        Vector3 initialPosition = finalPosition + Vector3.right * 90f;
+        Vector3 initialPosition = finalPosition + Vector3.right * 0.5f;
         GameObject newCube = Instantiate(cube, initialPosition, Quaternion.identity);
 
         // Set the number text of the cube
@@ -281,7 +306,7 @@ public class Bfs : MonoBehaviour
         yield return new WaitForSeconds(dequeueDelay);
 
         Vector3 initialPosition = cube.transform.position;
-        Vector3 finalPosition = initialPosition + Vector3.left * 90f;
+        Vector3 finalPosition = initialPosition + Vector3.left * 0.5f;
         float duration = 1.2f; // Duration of the movement
         float elapsedTime = 0f;
 

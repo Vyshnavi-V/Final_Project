@@ -20,7 +20,7 @@ public class Stack : MonoBehaviour
     private float cubeSize; // Size of the cube
     private float gap = 0.005f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
-    private float currentY = 0f; // Current Y position for spawning cubes
+    private float currentY = -0.5f; // Current Y position for spawning cubes
     private bool isPushing = false; // Flag to check if pushing is in progress
     private ARPlane trackPlane;
     private float spacing = 5f;
@@ -129,7 +129,7 @@ public class Stack : MonoBehaviour
     private void GenerateCubesOnPlane(string number)
 {
     //Vector3 planePosition = trackPlane.transform.position;
-    Vector3 planePosition = new Vector3(-0.2f, 0f, 0.5f);
+    Vector3 planePosition = new Vector3(-0.2f, -0.5f, 0.5f);
     // Set currentY to the plane's Y position
 
     // Increment currentY for the next cube
