@@ -52,9 +52,9 @@ public class Dfs : MonoBehaviour
         foreach (Transform square in squares)
         {
             string squareName = square.name;
-            if (squareName != "Line 2" && squareName != "Line 8")
+            if (squareName != "Line 10" && squareName != "Line 11")
             {
-                square.GetComponent<Renderer>().material.color = Color.green; 
+                square.GetComponent<Renderer>().material.color = Color.blue; 
             }
             yield return new WaitForSeconds(squareDelayBetweenChanges);
         }
@@ -66,7 +66,8 @@ public class Dfs : MonoBehaviour
     {
         foreach (Transform sphere in spheres)
         {
-            sphere.GetComponent<Renderer>().material.color = Color.yellow; 
+            sphere.GetComponent<Renderer>().material.color = Color.green; 
+            string sphereName = sphere.name;
             TextMeshProUGUI sphereText = sphere.GetComponentInChildren<TextMeshProUGUI>();
             orderText.text += sphereText.text + " ";
 
@@ -84,16 +85,24 @@ public class Dfs : MonoBehaviour
     IEnumerator PushPopOperations()
     {
         PushNumber("0");
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(4f);
 
         
 
         PushNumber("1");
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(4f);
 
         PushNumber("2");
-        yield return new WaitForSeconds(cubeDelay);
+        yield return new WaitForSeconds(2f);
 
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 2"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+        yield return new WaitForSeconds(2f);
+        PopNumber();
         
 
         PushNumber("3");
