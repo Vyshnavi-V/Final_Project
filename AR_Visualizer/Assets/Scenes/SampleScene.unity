@@ -38747,12 +38747,14 @@ MonoBehaviour:
   lineParent: {fileID: 471227173}
   sphereParent: {fileID: 747630687}
   orderCanvas: {fileID: 9149444982910219777}
-  cubePrefab: {fileID: 6588713635495144859, guid: 7213f3ab76d48a448afb966384e05529,
+  cubePrefab: {fileID: 4955357078219590821, guid: ea29948d8de2918468bdd446744605aa,
     type: 3}
   cubeDelay: 3
   squareDelayBetweenChanges: 4.7
   sphereDelayBetweenChanges: 4
   popDelay: 0.2
+  actionText: {fileID: 967505100}
+  orderText: {fileID: 975968197}
 --- !u!114 &845395806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55826,7 +55828,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1221759883
 Transform:
   m_ObjectHideFlags: 0
@@ -96899,12 +96901,12 @@ PrefabInstance:
     - target: {fileID: 5012156293292594071, guid: ea29948d8de2918468bdd446744605aa,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.128
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 5012156293292594071, guid: ea29948d8de2918468bdd446744605aa,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.716
+      value: -0.52
       objectReference: {fileID: 0}
     - target: {fileID: 5012156293292594071, guid: ea29948d8de2918468bdd446744605aa,
         type: 3}

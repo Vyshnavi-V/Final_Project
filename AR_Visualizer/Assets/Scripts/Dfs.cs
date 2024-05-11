@@ -14,19 +14,21 @@ public class Dfs : MonoBehaviour
     public float squareDelayBetweenChanges = 1f; 
     public float sphereDelayBetweenChanges = 1.5f; 
     public float popDelay = 2.5f; 
-
+    public TextMeshProUGUI actionText;
     private List<Transform> squares = new List<Transform>();
     private List<Transform> spheres = new List<Transform>();
-    private TextMeshProUGUI orderText;
+    public TextMeshProUGUI orderText;
     private Stack<string> numberStack = new Stack<string>(); 
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); 
     private float cubeSize; 
-    private float gap = 10f; 
-    private float currentY = 0f;
+    private float gap = 0.01f; 
+    private float currentY = -0.52f;
  
 
     void Start()
     {
+        actionText.text ="";
+        orderText.text ="Node Order:";
         foreach (Transform child in lineParent.transform)
         {
             squares.Add(child);
@@ -52,7 +54,7 @@ public class Dfs : MonoBehaviour
         foreach (Transform square in squares)
         {
             string squareName = square.name;
-            if (squareName != "Line 10" && squareName != "Line 11")
+            if (squareName != "Line 10" && squareName != "Line 11" && squareName!="Line 9")
             {
                 square.GetComponent<Renderer>().material.color = Color.blue; 
             }
@@ -66,12 +68,16 @@ public class Dfs : MonoBehaviour
     {
         foreach (Transform sphere in spheres)
         {
-            sphere.GetComponent<Renderer>().material.color = Color.green; 
             string sphereName = sphere.name;
+             if(sphereName != "Sphere 9"){
+            sphere.GetComponent<Renderer>().material.color = Color.green; 
+            
+           
             TextMeshProUGUI sphereText = sphere.GetComponentInChildren<TextMeshProUGUI>();
             orderText.text += sphereText.text + " ";
 
             yield return new WaitForSeconds(sphereDelayBetweenChanges);
+             }
         }
     }
 
@@ -85,13 +91,14 @@ public class Dfs : MonoBehaviour
     IEnumerator PushPopOperations()
     {
         PushNumber("0");
+        actionText.text = "We start with node 0. Push it into the stack";
         yield return new WaitForSeconds(4f);
 
         
-
+        actionText.text = "Push child of node 0--> node 1 into the stack";
         PushNumber("1");
         yield return new WaitForSeconds(4f);
-
+        actionText.text = "Push child of node 1--> node 2 into the stack";
         PushNumber("2");
         yield return new WaitForSeconds(2f);
 
@@ -101,62 +108,170 @@ public class Dfs : MonoBehaviour
                 sphere.GetComponent<Renderer>().material.color = Color.black;
              }
         }
-        yield return new WaitForSeconds(2f);
         PopNumber();
+        actionText.text = "No child for node 2.Pop it.Backtrack to node 1";
+
+        yield return new WaitForSeconds(2f);
+        
+        PushNumber("3");
+        actionText.text = "Push child of node 1--> node 3 into stack";
+        yield return new WaitForSeconds(4f);
         
 
-        PushNumber("3");
-        yield return new WaitForSeconds(cubeDelay);
 
         PushNumber("5");
-        yield return new WaitForSeconds(cubeDelay);
+        actionText.text = "Push child of node 3--> node 5 into the stack";
+
+        yield return new WaitForSeconds(4f);
+
 
         PushNumber("6");
-        yield return new WaitForSeconds(cubeDelay);
+        actionText.text = "Push child of node 5--> node 6 into the stack";
 
+        yield return new WaitForSeconds(2f);
+
+
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 5"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+        PopNumber();
+        actionText.text = "No child for node 6.Pop it.Backtrack to node 5";
+
+        yield return new WaitForSeconds(2f);
         
-
         PushNumber("7");
-        yield return new WaitForSeconds(cubeDelay);
+        actionText.text = "Push child of node 5--> node 7 into the stack";
+
+        yield return new WaitForSeconds(4f);
+
 
         PushNumber("8");
-        yield return new WaitForSeconds(cubeDelay);
+                actionText.text = "Push child of node 7--> node 8 into the stack";
+
+        yield return new WaitForSeconds(4f);
 
         PushNumber("9");
-        yield return new WaitForSeconds(cubeDelay);
+                actionText.text = "Push child of node 8--> node 9 into the stack";
+
+        yield return new WaitForSeconds(2f);
+
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 8"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+                actionText.text = "No child for node 9.Pop it.Backtrack to node 8";
+
+        PopNumber();
+        yield return new WaitForSeconds(2f);
+
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 7"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+        PopNumber();
+                actionText.text = "No child for node 8.Pop it.Backtrack to node 7";
+
+        yield return new WaitForSeconds(2f);
+
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 6"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+        PopNumber();
+                actionText.text = "No child for node 7.Pop it.Backtrack to node 5";
+
+        yield return new WaitForSeconds(2f);
+
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 4"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+        PopNumber();
+        actionText.text = "No child for node 5.Pop it.Backtrack to node 3";
+
+        yield return new WaitForSeconds(2f);
+
+        foreach(Transform sphere in spheres){
+             string sphereName = sphere.name;
+             if(sphereName=="Sphere 3"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
+        PopNumber();
+                actionText.text = "No child for node 3.Pop it.Backtrack to node 1";
+
+        yield return new WaitForSeconds(2f);
+
+        foreach(Transform sphere in spheres){
+            string sphereName = sphere.name;
+             if(sphereName=="Sphere 9"){
+                sphere.GetComponent<Renderer>().material.color = Color.green;
+                TextMeshProUGUI sphereText = sphere.GetComponentInChildren<TextMeshProUGUI>();
+
+                orderText.text += sphereText.text + " ";
+
+             }
+        }
+         foreach(Transform line in squares){
+            string sphereName = line.name;
+             if(sphereName=="Line 9"){
+                line.GetComponent<Renderer>().material.color = Color.blue;
+             }
+        }
 
         PushNumber("4");
-        yield return new WaitForSeconds(cubeDelay);
+                        actionText.text = "Push child of node 1--> node 4 into the stack";
 
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
+        yield return new WaitForSeconds(2f);
 
+    foreach(Transform sphere in spheres){
+            string sphereName = sphere.name;
+             if(sphereName=="Sphere 9"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
         PopNumber();
-        yield return new WaitForSeconds(popDelay);
+         actionText.text = "No child for node 4.Pop it.Backtrack to node 1";
 
+        yield return new WaitForSeconds(2f);
+        foreach(Transform sphere in spheres){
+            string sphereName = sphere.name;
+             if(sphereName=="Sphere 1"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
         PopNumber();
-        yield return new WaitForSeconds(popDelay);
+                        actionText.text = "No child for node 1.Pop it.Backtrack to node 0.";
 
+        yield return new WaitForSeconds(2f);
+        foreach(Transform sphere in spheres){
+            string sphereName = sphere.name;
+             if(sphereName=="Sphere 0"){
+                sphere.GetComponent<Renderer>().material.color = Color.black;
+             }
+        }
         PopNumber();
-        yield return new WaitForSeconds(popDelay);
+            actionText.text = "No child for node 1.Pop it.No nodes to traverse.";
 
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
+        yield return new WaitForSeconds(4f);
+        actionText.text = "DFS order is given above";
 
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
 
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
 
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
 
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
-
-        PopNumber();
-        yield return new WaitForSeconds(popDelay);
+        
+        
 
 
     }
@@ -197,7 +312,7 @@ public class Dfs : MonoBehaviour
         currentY += cubeSize + gap; // Adding a small gap between cubes
 
         // Calculate the final position of the cube
-        Vector3 finalPosition = new Vector3(0f, currentY, 0f);
+        Vector3 finalPosition = new Vector3(2.2f, currentY, 0.5f);
 
         // Start the coroutine to move the cube to its final position
         StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));
@@ -262,7 +377,8 @@ public class Dfs : MonoBehaviour
 
         // Ensure the cube is at its final position
         cube.transform.position = finalPosition;
-
+        currentY -= cubeSize;
+        currentY -= gap;
         // Destroy the cube
         Destroy(cube);
     }
