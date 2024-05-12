@@ -262,7 +262,7 @@ public class Dfs : MonoBehaviour
              }
         }
         PopNumber();
-            actionText.text = "No child for node 1.Pop it.No nodes to traverse.";
+            actionText.text = "No child for node 0.Pop it.No nodes to traverse.";
 
         yield return new WaitForSeconds(4f);
         actionText.text = "DFS order is given above";
