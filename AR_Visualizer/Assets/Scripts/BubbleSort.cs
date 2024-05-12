@@ -707,7 +707,7 @@ private void movePPRCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetX = -spacing * 0.07f; 
+    float offsetX = -0.5f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
@@ -725,7 +725,7 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetY = spacing * 0.07f; 
+    float offsetY = 0.5f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {

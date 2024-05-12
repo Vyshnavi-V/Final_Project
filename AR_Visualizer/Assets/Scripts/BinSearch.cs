@@ -5,48 +5,37 @@ using System.Collections;
 using UnityEngine.XR.ARFoundation;
 
 
-public class LinearSearchVisualization : MonoBehaviour
+public class BinSearch : MonoBehaviour
 {
-     public ARPlaneManager arPlaneManager; 
+         public ARPlaneManager arPlaneManager; 
+
     public GameObject cubePrefab;
     public GameObject indexPrefab;
     public TMP_InputField inputField;
     public TMP_InputField searchInputField;
     public TextMeshProUGUI infoText;
 
-    public float spacing = 2f;
-    public Color textColor = Color.white;
-    public Color indexColor = Color.black;
+    public float spacing = 0.2f;
+    public Color textColor = Color.blue;
+    public Color indexColor = Color.white;
     public Color searchColor = Color.red;
     public float searchDelay = 1f;
     public float textDelay = 2f;
-    public Canvas exitCanvas;
-    public Canvas infoCanvas;
-
-private ARPlane trackPlane;
 
     private GameObject[] mainCubes;
+    private ARPlane trackPlane;
     private GameObject[] indexCubes;
     private bool searchingInProgress = false;
     private bool paused = false;
+    public Canvas exitCanvas;
+    public Canvas infoCanvas;
+    private bool waitForPause = false; // Flag to indicate if coroutine should wait for pause
 
-    public void StartSearch(ARPlane plane)
+private void Start()
     {
-        if (searchingInProgress)
-            return;
-
-        searchingInProgress = true;
-
-        // Clear previous search results
-        ResetSearch();
-
-        // Start generating cubes
-        GenerateCubes(plane);
-
-        // Start the search process
-        StartCoroutine(LinearSearchCoroutine());
+        //submitButton.onClick.AddListener(OnSubmitButtonClick);
     }
-    public void OnSubmitButtonClick()
+public void OnSubmitButtonClick()
     {
 
         StartCoroutine(WaitForPlaneDetection());
@@ -68,7 +57,7 @@ private ARPlane trackPlane;
                     yield return new WaitForSeconds(10f);
                     // Plane detected, generate cubes on this plane
                     trackPlane = arPlane;
-                    StartSearch(arPlane);
+                    StartSearch();
                     yield break; // Exit the coroutine
                 }
             }
@@ -82,6 +71,23 @@ private ARPlane trackPlane;
         Debug.LogError("No AR planes detected within the time limit.");
         infoText.text = "No AR plane detected within 1 minute.Exit and scan again";
     }
+    public void StartSearch()
+    {
+        if (searchingInProgress)
+            return;
+
+        searchingInProgress = true;
+
+        // Clear previous search results
+        ResetSearch();
+
+        // Start generating cubes
+        GenerateCubes(trackPlane);
+
+        // Start the search process
+        StartCoroutine(BinarySearchCoroutine());
+    }
+
     private void GenerateCubes(ARPlane plane)
     {
         string inputText = inputField.text;
@@ -93,9 +99,11 @@ private ARPlane trackPlane;
         indexCubes = new GameObject[numbers.Length];
         Vector3 planePosition = plane.transform.position;
 
+
         for (int i = 0; i < numbers.Length; i++)
         {
-             Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y + 0.7f, planePosition.z + 1f);
+            // Generate main value cube
+            Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y + 0.5f, planePosition.z + 1f);
 
             GameObject mainCube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             mainCubes[i] = mainCube;
@@ -104,7 +112,8 @@ private ARPlane trackPlane;
             mainTextMesh.text = numbers[i];
             mainTextMesh.color = textColor;
 
-            Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z + 1f);
+            // Generate index cube
+            Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.3f, planePosition.z + 1f);
 
             GameObject indexCube = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
             indexCubes[i] = indexCube;
@@ -113,55 +122,118 @@ private ARPlane trackPlane;
             indexTextMesh.text = i.ToString();
             indexTextMesh.color = indexColor;
 
-            currentX += 0.2f;
+            currentX +=spacing;
         }
         movePPRCanvas(exitCanvas,mainCubes[0].transform.position);
         int n=mainCubes.Length;
         moveBackCanvas(infoCanvas,mainCubes[n/2].transform.position);
+        // Start sorting coroutine
     }
 
-    private IEnumerator LinearSearchCoroutine()
+    private IEnumerator BinarySearchCoroutine()
     {
         yield return new WaitForSeconds(searchDelay);
 
-        int searchNumber = int.Parse(searchInputField.text);
+        int[] numbers = new int[mainCubes.Length];
+        for (int i = 0; i < mainCubes.Length; i++)
+        {
+            TextMeshProUGUI textMesh = mainCubes[i].GetComponentInChildren<TextMeshProUGUI>();
+            numbers[i] = int.Parse(textMesh.text);
+        }
 
+        int searchNumber = int.Parse(searchInputField.text);
+        int left = 0;
+        int right = numbers.Length - 1;
         bool numberFound = false;
 
-        for (int i = 0; i < mainCubes.Length; i++)
+        while (left <= right)
         {
             if (paused)
             {
-                yield return new WaitWhile(() => paused == true); // Pause the search
+                waitForPause = true; // Set the flag to wait for pause
+                yield return new WaitWhile(() => paused == true); // Wait for resume
+                waitForPause = false; // Reset the flag
             }
 
-            TextMeshProUGUI textMesh = mainCubes[i].GetComponentInChildren<TextMeshProUGUI>();
-            int cubeNumber = int.Parse(textMesh.text);
+            if (waitForPause)
+                yield return null; // Wait for pause command to be processed
 
-            infoText.text = "Comparing " + cubeNumber + " and " + searchNumber;
+            int middle = (left + right) / 2;
+
+            // Change color of the middle cube to red
+            TextMeshProUGUI middleTextMesh = mainCubes[middle].GetComponentInChildren<TextMeshProUGUI>();
+            middleTextMesh.color = Color.yellow;
+
             yield return new WaitForSeconds(textDelay);
 
-            textMesh.color = searchColor;
+            int middleNumber = int.Parse(middleTextMesh.text);
 
-            if (cubeNumber != searchNumber)
+            infoText.text = "Current mid index =" + middle +", Mid element a[mid]="+ middleNumber;
+            yield return new WaitForSeconds(textDelay);
+
+
+            infoText.text = "Comparing " + middleNumber + " and " + searchNumber;
+            yield return new WaitForSeconds(textDelay);
+
+            middleTextMesh.color = textColor; // Reset color
+
+            if (middleNumber == searchNumber)
             {
-                infoText.text = cubeNumber + " != " + searchNumber;
-                yield return new WaitForSeconds(textDelay);
-
-                if (i != mainCubes.Length - 1)
-                {
-                    infoText.text = "Checking next number";
-                    yield return new WaitForSeconds(textDelay);
-                }
-
-                textMesh.color = textColor;
-            }
-            else
-            {
-                textMesh.color = Color.green;
-                infoText.text = cubeNumber + " = " + searchNumber + ". Number found at position " + i;
+                middleTextMesh.color = Color.green;
+                infoText.text = middleNumber + " = " + searchNumber + ". Number found at position " + middle;
                 numberFound = true;
                 break;
+            }
+            else if (middleNumber < searchNumber)
+            {   
+                infoText.text = middleNumber + "<" + searchNumber;
+                yield return new WaitForSeconds(textDelay);
+
+                // Calculate the horizontal shift
+                float shiftAmount = mainCubes[middle].transform.position.x;
+
+                infoText.text ="Move right: Apply binary search to the subarray -->right of the middle element.";
+                yield return new WaitForSeconds(textDelay);
+                // Destroy cubes to the left of middle including middle
+                for (int i = left; i <= middle; i++)
+                {
+                    Destroy(mainCubes[i]);
+                    Destroy(indexCubes[i]);
+                }
+                yield return new WaitForSeconds(textDelay);
+                
+                // Update the left value
+                left = middle + 1;
+
+                /*
+                // Apply horizontal shift to all remaining cubes
+                for (int i = left; i <= right; i++)
+                {
+                    Vector3 newPosition = mainCubes[i].transform.position;
+                    newPosition.x -= shiftAmount; // Shift left
+                    mainCubes[i].transform.position = newPosition;
+
+                    newPosition = indexCubes[i].transform.position;
+                    newPosition.x -= shiftAmount; // Shift left
+                    indexCubes[i].transform.position = newPosition;
+                }
+                */
+            }
+            else
+            {   
+                infoText.text = middleNumber + ">" + searchNumber;
+                yield return new WaitForSeconds(textDelay);
+
+                infoText.text ="Move left:Apply binary serach to the subarray->left of the middle element.";
+
+                yield return new WaitForSeconds(textDelay);
+                // Destroy cubes to the right of middle including middle
+                for (int i = middle; i <= right; i++)
+                {
+                    Destroy(mainCubes[i]);
+                    Destroy(indexCubes[i]);
+                }
+                right = middle - 1;
             }
         }
 
@@ -172,6 +244,7 @@ private ARPlane trackPlane;
 
         searchingInProgress = false;
     }
+
 
     private void ResetSearch()
     {
@@ -209,15 +282,15 @@ private ARPlane trackPlane;
         ResetSearch(); // Reset the search
         searchingInProgress = false; // Reset the searching in progress flag
         paused = false; // Reset the paused flag
-        StartSearch(trackPlane); // Start the search process again
+        StartSearch(); // Start the search process again
     }
-    public void DestroyAllObjectsAndResetInfoText()
+     public void DestroyAllObjectsAndResetInfoText()
 {
     ResetSearch(); // Destroy all objects created
     infoText.text = ""; // Set infoText to null
     searchingInProgress = false;
 }
-private void movePPRCanvas(Canvas canvas, Vector3 position)
+    private void movePPRCanvas(Canvas canvas, Vector3 position)
 {
     if (canvas == null)
     {
@@ -242,7 +315,7 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("Canvas parameter is null. Cannot move canvas.");
         return;
     }
-    float offsetY =  0.5f; 
+    float offsetY = 0.5f; 
     RectTransform canvasRect = canvas.GetComponent<RectTransform>();
     if (canvasRect != null)
     {
