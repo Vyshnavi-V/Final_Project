@@ -14,6 +14,7 @@ public class BinSearch : MonoBehaviour
     public TMP_InputField inputField;
     public TMP_InputField searchInputField;
     public TextMeshProUGUI infoText;
+     public TextMeshProUGUI firstText;
 
     public float spacing = 0.2f;
     public Color textColor = Color.blue;
@@ -38,6 +39,7 @@ private void Start()
 public void OnSubmitButtonClick()
     {
 
+        infoText.text = ""; 
         StartCoroutine(WaitForPlaneDetection());
     }
     private IEnumerator WaitForPlaneDetection()
@@ -132,6 +134,7 @@ public void OnSubmitButtonClick()
 
     private IEnumerator BinarySearchCoroutine()
     {
+      
         yield return new WaitForSeconds(searchDelay);
 
         int[] numbers = new int[mainCubes.Length];
@@ -142,6 +145,7 @@ public void OnSubmitButtonClick()
         }
 
         int searchNumber = int.Parse(searchInputField.text);
+          firstText.text = "Element to be searched: "+ searchNumber;
         int left = 0;
         int right = numbers.Length - 1;
         bool numberFound = false;
@@ -282,6 +286,7 @@ public void OnSubmitButtonClick()
         ResetSearch(); // Reset the search
         searchingInProgress = false; // Reset the searching in progress flag
         paused = false; // Reset the paused flag
+         infoText.text = ""; 
         StartSearch(); // Start the search process again
     }
      public void DestroyAllObjectsAndResetInfoText()

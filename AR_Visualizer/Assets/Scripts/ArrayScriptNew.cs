@@ -10,6 +10,7 @@ public class ArrayScriptNew : MonoBehaviour
     public ARPlaneManager arPlaneManager;
     public TextMeshProUGUI infotext;
     public GameObject cubePrefab;
+    public GameObject indexPrefab;
     public TMP_InputField sizeInputField;
     public TMP_InputField entriesInputField; 
     public GameObject inputCanvas;
@@ -21,12 +22,14 @@ public class ArrayScriptNew : MonoBehaviour
     public TMP_InputField indexInputField;
     public TMP_InputField valueInputField;
     public TMP_InputField deleteIndexInputField;
-
+    public TextMeshProUGUI infoText;
+    public TextMeshProUGUI firstText;
     private List<GameObject> cubes = new List<GameObject>();
-
+    private GameObject[] indexes;
  private void Start()
     {
-      
+      infoText.text ="";
+      firstText.text="";
     }
     public void OnSubmitButtonClick()
     {
@@ -70,6 +73,8 @@ public class ArrayScriptNew : MonoBehaviour
     }
         public void GenerateCubesOnPlane()
     {
+        infoText.text = "Array Created";
+
         string[] entries = entriesInputField.text.Split(','); // Split the input string by commas
 
         // Check if the number of entries matches the size of the array
@@ -91,7 +96,9 @@ public class ArrayScriptNew : MonoBehaviour
 
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             cubes.Add(cube);
-
+             Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.2f, planePosition.z + 1f);
+            GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
+ indexes[i] = index;
             // Update currentX for the next cube
             currentX += spacing;
 
@@ -235,6 +242,8 @@ IEnumerator DelayFn()
     int index = int.Parse(indexInputField.text);
     int value = int.Parse(valueInputField.text);
 
+    infoText.text="Value: " + value+ "inserted at index: "+index;
+    firstText.text ="Right Shift performed on the array.";
     if (index < 0 || index > cubes.Count)
     {
         Debug.LogError("Invalid index for insertion.");
@@ -254,6 +263,7 @@ IEnumerator DelayFn()
     // Otherwise, insert a new cube with the new value
     else
     {
+        Destroy(cubes[index]);
         // Instantiate a new cube below the cube at the given index
         Vector3 newPosition = cubes[index].transform.position - new Vector3(0f, cubePrefab.transform.localScale.y, 0f);
         GameObject newCube = Instantiate(cubePrefab, newPosition, Quaternion.identity);
@@ -278,6 +288,7 @@ IEnumerator DelayFn()
         }
         yield return new WaitForSeconds(1f);
 
+        //Destroy(cubes[index]);
         // Insert the new cube into the list at the specified index
         cubes.Insert(index, newCube);
 
@@ -292,8 +303,11 @@ IEnumerator DelayFn()
 }
 public void DeleteValueAtIndex()
 {
-   
     int index = int.Parse(deleteIndexInputField.text);
+    int value = int.Parse(cubes[index].GetComponentInChildren<TextMeshProUGUI>().text);
+    infoText.text="Value: " + value+ "inserted at index: "+index;
+        firstText.text = "Left Shift perfomed on the array.";
+
 
     if (index < 0 || index >= cubes.Count)
     {

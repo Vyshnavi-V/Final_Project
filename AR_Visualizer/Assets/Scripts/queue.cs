@@ -118,7 +118,7 @@ public void OnSubmitButtonClick()
     private IEnumerator MoveCubeToPosition(GameObject cube, Vector3 finalPosition, string number)
     {
         // Instantiate the cube at an initial position far to the right
-        Vector3 initialPosition = finalPosition + Vector3.right * 0.05f;
+        Vector3 initialPosition = finalPosition + Vector3.right * 0.03f;
         GameObject newCube = Instantiate(cube, initialPosition, Quaternion.identity);
 
         // Set the number text of the cube

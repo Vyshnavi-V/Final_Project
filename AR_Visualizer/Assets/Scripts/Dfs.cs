@@ -23,12 +23,35 @@ public class Dfs : MonoBehaviour
     private float cubeSize; 
     private float gap = 0.01f; 
     private float currentY = -0.52f;
+    public Material sphereMaterial;
+    public Color LineColor;
  
+    
+    void Start(){
 
-    void Start()
+    }
+    public void StartDFS()
     {
+        if (cubeDictionary.Count > 0)
+        {
+            foreach (var cube in cubeDictionary.Values)
+            {
+                Destroy(cube);
+            }
+
+            // Clear the dictionary after destroying all objects
+            cubeDictionary.Clear();
+        }
         actionText.text ="";
         orderText.text ="Node Order:";
+        foreach (Transform sphere in spheres)
+        {
+            sphere.GetComponent<Renderer>().material = sphereMaterial;
+        }
+        foreach (Transform square in squares)
+        {
+            square.GetComponent<Renderer>().material.color = Color.white;
+        }
         foreach (Transform child in lineParent.transform)
         {
             squares.Add(child);
@@ -51,6 +74,7 @@ public class Dfs : MonoBehaviour
 
     IEnumerator ChangeSquareColors()
     {
+         yield return new WaitForSeconds(squareDelayBetweenChanges);
         foreach (Transform square in squares)
         {
             string squareName = square.name;
@@ -66,6 +90,7 @@ public class Dfs : MonoBehaviour
 
     IEnumerator ChangeSphereColors()
     {
+        yield return new WaitForSeconds(squareDelayBetweenChanges);
         foreach (Transform sphere in spheres)
         {
             string sphereName = sphere.name;
