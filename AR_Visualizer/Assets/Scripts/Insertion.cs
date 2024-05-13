@@ -46,12 +46,15 @@ public class Insertion : MonoBehaviour
             if (i < 4) randomNumbers += ",";
         }
         InputField.text = randomNumbers;
-        //GenerateCubesOnPlane();
+        OnSubmitButtonClick();
     }
 
     public void OnSubmitButtonClick()
     {
 
+actionText.text="";
+infotext.text="";
+iterationText.text="";
         // Start a coroutine to wait for plane detection
         StartCoroutine(WaitForPlaneDetection());
     }
@@ -91,7 +94,7 @@ public class Insertion : MonoBehaviour
     }
         public void GenerateCubesOnPlane(ARPlane plane)
     {
-        actionText.text = "This is called";
+        //actionText.text = "This is called";
         
         if (sortingInProgress)
         {
@@ -107,6 +110,7 @@ public class Insertion : MonoBehaviour
 
         string userInput = InputField.text;
         string[] numbers = userInput.Split(',');
+        //InputField.text="";
 
         // Calculate total width
         float totalWidth = (numbers.Length - 1) * spacing;

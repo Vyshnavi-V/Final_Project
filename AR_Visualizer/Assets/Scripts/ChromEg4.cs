@@ -25,6 +25,8 @@ infoText.text="";
     sphere22.GetComponent<Renderer>().material = sphereMaterial;
       sphere23.GetComponent<Renderer>().material = sphereMaterial;
     sphere24.GetComponent<Renderer>().material = sphereMaterial;
+            textComponent.text="";
+infoText.text="";
         StartCoroutine(StartChromatic());
     }
     IEnumerator StartChromatic()

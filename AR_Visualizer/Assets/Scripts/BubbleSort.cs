@@ -369,9 +369,23 @@ private ARPlane trackPlane;
     {
         //submitButton.onClick.AddListener(OnSubmitButtonClick);
     }
+public void GenerateRandomCubes()
+    {
+        int cubeCount = Random.Range(5, 10); // Generates a random number between 5 and 10
+        string[] randomNumbers = new string[cubeCount];
 
+        for (int i = 0; i < cubeCount; i++)
+        {
+            randomNumbers[i] = Random.Range(-50, 100).ToString(); // Generates a random number between -100 and 100
+        }
+
+        userInputField.text = string.Join(",", randomNumbers); // Sets the input field text to the generated random numbers
+        OnSubmitButtonClick(); // Calls the existing method to generate and sort the cubes
+    }
     public void OnSubmitButtonClick()
     {
+        actiontext.text="";
+iterationText.text="";
         bubbleInputCanvas.SetActive(false);
 
         // Start a coroutine to wait for plane detection
@@ -424,6 +438,7 @@ private ARPlane trackPlane;
         // Destroy previous cubes and indexes
 
         string userInput = userInputField.text;
+
         string[] numbers = userInput.Split(',');
 
         // Calculate total width
@@ -699,6 +714,8 @@ private ARPlane trackPlane;
     cubes = null;
     indexes = null;
     sortingInProgress = false;
+    actiontext.text="";
+iterationText.text="";
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)
 {
@@ -736,7 +753,9 @@ private void moveBackCanvas(Canvas canvas, Vector3 position)
         Debug.LogError("RectTransform component not found on the canvas. Cannot move canvas.");
     }
 }
-
+public void inputFieldClear(TMP_InputField field){
+    field.text="";
+}
 
 
 }

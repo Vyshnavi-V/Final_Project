@@ -33,10 +33,13 @@ public class SelectionSort : MonoBehaviour
 
     private void Start()
     {
+        
+        iterationText.text="";
+    actiontext.text="";
         // You can add a listener to the submit button or call GenerateCubes() from elsewhere in your code.
     }
 
-/*
+
     public void GenerateRandomCubes()
     {
         int cubeCount = Random.Range(5, 10); // Generates a random number between 5 and 10
@@ -47,13 +50,15 @@ public class SelectionSort : MonoBehaviour
             randomNumbers[i] = Random.Range(-50, 100).ToString(); // Generates a random number between -100 and 100
         }
 
-        inputField.text = string.Join(",", randomNumbers); // Sets the input field text to the generated random numbers
-        GenerateCubes(); // Calls the existing method to generate and sort the cubes
+        userInputField.text = string.Join(",", randomNumbers); // Sets the input field text to the generated random numbers
+        OnSubmitButtonClick(); // Calls the existing method to generate and sort the cubes
     }
-*/
+
 public void OnSubmitButtonClick()
     {
 
+iterationText.text="";
+    actiontext.text="";
         // Start a coroutine to wait for plane detection
         StartCoroutine(WaitForPlaneDetection());
     }
@@ -92,7 +97,7 @@ public void OnSubmitButtonClick()
 
     public void GenerateCubesOnPlane(ARPlane plane)
     {
-        actiontext.text = "This is called";
+        //actiontext.text = "This is called";
         
         if (sortingInProgress)
         {
@@ -363,6 +368,9 @@ while (cubes[i].transform.position.y > originalY || cubes[minIndex].transform.po
     // Reset cube and index arrays
     cubes = null;
     indexes = null;
+    //userInputField.text="";
+    iterationText.text="";
+    actiontext.text="";
      
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)

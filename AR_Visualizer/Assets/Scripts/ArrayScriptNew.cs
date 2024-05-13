@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.XR.ARFoundation;
+using Unity.VisualScripting;
 
 public class ArrayScriptNew : MonoBehaviour
 {
@@ -144,6 +145,8 @@ public class ArrayScriptNew : MonoBehaviour
     
    public void CreateArray()
 {
+    infoText.text="";
+    firstText.text="";
     int arraySize = int.Parse(sizeInputField.text); // Get the size of the array from the input field
 
     // Clean up previously generated cubes
@@ -263,6 +266,8 @@ IEnumerator DelayFn()
     if (index < 0 || index > cubes.Count)
     {
         Debug.LogError("Invalid index for insertion.");
+        infoText.text="";
+        firstText.text="Invalid index for insertion";
         //return;
     }
 
@@ -317,8 +322,12 @@ IEnumerator DelayFn()
         cubes.RemoveAt(cubes.Count - 1);
     }
 }
-public void DeleteValueAtIndex()
+public void DeleteValueAtIndex(){
+    StartCoroutine(DeleteValue());
+}
+IEnumerator DeleteValue()
 {
+    yield return new WaitForSeconds(2f);
     int index = int.Parse(deleteIndexInputField.text);
     int value = int.Parse(cubes[index].GetComponentInChildren<TextMeshProUGUI>().text);
     infoText.text="Value deleted from index "+index;
@@ -328,7 +337,8 @@ public void DeleteValueAtIndex()
     if (index < 0 || index >= cubes.Count)
     {
         Debug.LogError("Invalid index for deletion.");
-        return;
+        infoText.text="";
+        firstText.text="Invalid index for deletion";
     }
 
     // Shift values to the left starting from the index position
@@ -370,7 +380,8 @@ public void DestroyAllObjects()
     {
         Destroy(cube);
     }
-
+infoText.text="";
+    firstText.text="";
     // Clear the list of cubes
     cubes.Clear();
 }

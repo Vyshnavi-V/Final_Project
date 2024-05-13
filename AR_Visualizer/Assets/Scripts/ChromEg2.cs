@@ -23,6 +23,7 @@ public void ChromaticMethod(){
     sphere3.GetComponent<Renderer>().material = sphereMaterial;
     sphere4.GetComponent<Renderer>().material = sphereMaterial;
     infoText.text="";
+        textComponent.text="";
         StartCoroutine(StartChromatic());
     }
     private IEnumerator StartChromatic()

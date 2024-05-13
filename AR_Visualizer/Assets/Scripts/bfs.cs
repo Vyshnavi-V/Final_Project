@@ -371,8 +371,7 @@ public class Bfs : MonoBehaviour
     public void exitMethod(){
     orderText.text="";
     actionText.text="";
-    currentX-=cubeSize;
-    currentX-=gap;
+    currentX=-0.2f;
     if (cubeDictionary.Count > 0)
         {
             foreach (var cube in cubeDictionary.Values)

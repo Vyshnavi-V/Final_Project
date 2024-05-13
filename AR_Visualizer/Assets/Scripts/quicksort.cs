@@ -581,6 +581,11 @@ public class Quicksort : MonoBehaviour
 
     private void Start()
     {
+        comparisonText.text="";
+        StatusText.text="";
+        highText.text="";
+        lowText.text="";
+        pivotText.text="";
         // Add listener to random button click event
         randomButton.onClick.AddListener(GenerateRandomNumbers);
     }
@@ -641,6 +646,7 @@ public class Quicksort : MonoBehaviour
 
         string Nos = inputField.text; // Get input numbers as string
         string[] numbers = Nos.Split(','); // Split input string into array of numbers
+        //inputField.text="";
 
         GenerateInitialCubes(numbers); // Generate initial cubes and start sorting
     }
@@ -1102,6 +1108,11 @@ public class Quicksort : MonoBehaviour
             generatedCubes.Clear();
         }
         sortingInProgress = false;
+        comparisonText.text="";
+        StatusText.text="";
+        highText.text="";
+        lowText.text="";
+        pivotText.text="";
     }
     private void movePPRCanvas(Canvas canvas, Vector3 position)
 {

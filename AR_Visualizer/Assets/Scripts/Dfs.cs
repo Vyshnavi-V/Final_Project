@@ -421,8 +421,7 @@ public class Dfs : MonoBehaviour
     public void exitMethod(){
     orderText.text="";
     actionText.text="";
-    currentY-=cubeSize;
-    currentY-=gap;
+    currentY=-0.52f;  
     if (cubeDictionary.Count > 0)
         {
             foreach (var cube in cubeDictionary.Values)

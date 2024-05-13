@@ -25,6 +25,7 @@ public void ChromaticMethod(){
     {
         // Change colors sequentially with delay
         infoText.text="";
+        textComponent.text="";
         yield return StartCoroutine(ChangeToColor(sphere1, Color.red));
         infoText.text = "We color node 1 with color red";
         UpdateText("Red -->Yes");

@@ -35,6 +35,7 @@ void Start(){
 }
     public void StartSearch(ARPlane plane)
     {
+        infoText.text="";
         if (searchingInProgress)
             return;
 
@@ -52,6 +53,7 @@ void Start(){
     public void OnSubmitButtonClick()
     {
 
+        infoText.text="";
         StartCoroutine(WaitForPlaneDetection());
     }
     private IEnumerator WaitForPlaneDetection()
@@ -219,6 +221,7 @@ void Start(){
     ResetSearch(); // Destroy all objects created
     infoText.text = ""; // Set infoText to null
     searchingInProgress = false;
+    
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)
 {

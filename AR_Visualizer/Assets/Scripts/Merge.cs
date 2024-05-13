@@ -1,11 +1,9 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using System;
 using System.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine.XR.ARFoundation;
 
 public class Merge : MonoBehaviour
@@ -39,12 +37,31 @@ public class Merge : MonoBehaviour
 
     private void Start()
     {
+        infoText.text="";
+    actiontext.text="";
         // Add a button or event listener here to call GenerateCubes()
     }
+public void GenerateRandomCubes()
+    {
+        
+        infoText.text="";
+    actiontext.text="";
+        int cubeCount = UnityEngine.Random.Range(5, 10); // Generates a random number between 5 and 10
+        string[] randomNumbers = new string[cubeCount];
 
+        for (int i = 0; i < cubeCount; i++)
+        {
+            randomNumbers[i] = UnityEngine.Random.Range(-50, 100).ToString(); // Generates a random number between -100 and 100
+        }
+
+        inputField.text = string.Join(",", randomNumbers); // Sets the input field text to the generated random numbers
+        OnSubmitButtonClick(); // Calls the existing method to generate and sort the cubes
+    }
  public void OnSubmitButtonClick()
     {
-
+        
+        infoText.text="";
+    actiontext.text="";
         // Start a coroutine to wait for plane detection
         StartCoroutine(WaitForPlaneDetection());
     }
@@ -83,6 +100,9 @@ public class Merge : MonoBehaviour
     }
         public void GenerateCubesOnPlane(ARPlane plane)
     {
+        
+        infoText.text="";
+    actiontext.text="";
         if (cubes != null)
         {
             foreach (var cube in cubes)
@@ -95,6 +115,7 @@ public class Merge : MonoBehaviour
 
         string Nos = inputField.text;
         string[] numbers = Nos.Split(',');
+        //inputField.text="";
 
         float totalWidth = (numbers.Length - 1) * spacing;
         float startX = -0.5f;
@@ -1223,6 +1244,9 @@ public class Merge : MonoBehaviour
     }
     public void DestroyAllObjects()
 {
+    
+        infoText.text="";
+    actiontext.text="";
     // Destroy cubes
     if (cubes != null)
     {

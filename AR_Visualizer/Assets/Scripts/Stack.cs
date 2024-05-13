@@ -55,6 +55,7 @@ public class Stack : MonoBehaviour
     // Method to push numbers onto the stack
     public void PushNumbers()
     {
+        infotext.text="";
         if (!isPushing)
         {
             StartCoroutine(PushProcess());
@@ -107,6 +108,7 @@ public class Stack : MonoBehaviour
     // Coroutine for pushing process
     private IEnumerator PushProcess()
     {
+        infotext.text="";
         isPushing = true;
 
         string input = inputField.text;
@@ -184,6 +186,7 @@ public class Stack : MonoBehaviour
     // Method to pop a number from the stack
     public void PopNumber()
     {
+        infotext.text="";
 
         if (numberStack.Count > 0)
         {

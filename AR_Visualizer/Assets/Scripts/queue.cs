@@ -248,6 +248,7 @@ private void UpdateFrontAndRearTextPositions()
     // Method to generate a cube with a given number
     private void GenerateCubesOnPlane(string number)
     {
+        infotext.text="";
         // Increment currentX for the next cube
         currentX += cubeSize + gap; // Adding a small gap between cubes
 

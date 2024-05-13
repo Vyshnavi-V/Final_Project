@@ -570,7 +570,8 @@ public class BinaryTree : MonoBehaviour
     public TMP_InputField deletionInputField; // Input field for deletion
     public TextMeshProUGUI traversalText; // TextMeshPro element to display traversal order
     public float delayBetweenNodes = 0.5f; // Delay between visualizing each node
-    private Color initialColor = Color.white; // Initial color of nodes and lines
+    private Color initialColor = Color.white; 
+    public TextMeshProUGUI actionText;// Initial color of nodes and lines
 
     private class Node
     {
@@ -589,9 +590,12 @@ public class BinaryTree : MonoBehaviour
 
     public void AddNodes()
     {
+        
+        traversalText.text="";
         string values = inputField.text;
         string[] valueArray = values.Split(',');
-
+        actionText.text="Value Greater than a node-->Right";
+        traversalText.text="Value Lesser than a node-->Left";
         StartCoroutine(AddNodesWithDelay(valueArray));
     }
     private void Start()
@@ -642,6 +646,8 @@ public class BinaryTree : MonoBehaviour
 
     public void InsertNode()
     {
+        actionText.text="";
+        traversalText.text="";
         StartCoroutine(InsertNodeWithDelay());
     }
 
@@ -672,6 +678,9 @@ public class BinaryTree : MonoBehaviour
         if (int.TryParse(deletionInputField.text, out valueToDelete))
         {
             Debug.Log("Deleting node with value: " + valueToDelete);
+            actionText.text="";
+        traversalText.text="";
+        actionText.text ="Deleted node is replaced with it's inorder succesor";
             DeleteNodeWithValue(valueToDelete);
             PositionNodes();
             UpdateNodePositions();
@@ -687,6 +696,7 @@ public class BinaryTree : MonoBehaviour
 
     private IEnumerator DoInorderTraversal(Node node)
     {
+        actionText.text ="Left --> Root--> Right ";
          yield return new WaitForSeconds(delayBetweenNodes*3);
         if (node != null)
         {
@@ -709,6 +719,7 @@ public class BinaryTree : MonoBehaviour
 
     private IEnumerator DoPreorderTraversal(Node node)
     {
+        actionText.text ="Root-->Left --> Right ";
          yield return new WaitForSeconds(delayBetweenNodes*3);
         if (node != null)
         {
@@ -729,6 +740,7 @@ public class BinaryTree : MonoBehaviour
 
     private IEnumerator DoPostorderTraversal(Node node)
     {
+        actionText.text ="Left --> Right --> Root";
         yield return new WaitForSeconds(delayBetweenNodes*3);
         if (node != null)
         {
@@ -1021,6 +1033,8 @@ public class BinaryTree : MonoBehaviour
             Destroy(line);
         }
     }
+    actionText.text="";
+    traversalText.text="";
 
     // Clear the list of nodes
     nodes.Clear();
