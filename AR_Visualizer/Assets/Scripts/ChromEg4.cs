@@ -13,12 +13,19 @@ public class ChromEg5 : MonoBehaviour
     public TextMeshProUGUI textComponent; // Reference to the TMP Text
     public TextMeshProUGUI infoText; // Reference to the TMP Text component
     public float delayBetweenChanges = 1.0f; // Delay between color changes
+    public Material sphereMaterial;
 
 void Start(){
 infoText.text="";
 }
     public void ChromaticMethod(){
-        StartChromatic();
+        sphere19.GetComponent<Renderer>().material = sphereMaterial;
+    sphere20.GetComponent<Renderer>().material = sphereMaterial;
+    sphere21.GetComponent<Renderer>().material = sphereMaterial;
+    sphere22.GetComponent<Renderer>().material = sphereMaterial;
+      sphere23.GetComponent<Renderer>().material = sphereMaterial;
+    sphere24.GetComponent<Renderer>().material = sphereMaterial;
+        StartCoroutine(StartChromatic());
     }
     IEnumerator StartChromatic()
     {
@@ -118,7 +125,7 @@ yield return StartCoroutine(ChangeToColor(sphere21, Color.red));
 
         SetTextProperties(sphere21.transform.position, textComponent);
         yield return new WaitForSeconds(delayBetweenChanges);
-                infoText.text = "Coloring finished";
+                infoText.text = "Coloring finished--> Chromatic No:3";
 
 
         
@@ -152,6 +159,7 @@ yield return StartCoroutine(ChangeToColor(sphere21, Color.red));
 }
 public void exitMethod(){
     infoText.text="";
+    textComponent.text="";
     StopAllCoroutines();
 }
 

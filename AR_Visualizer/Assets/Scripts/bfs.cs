@@ -24,12 +24,36 @@ public class Bfs : MonoBehaviour
     private float gap = 0.01f; // Gap between cubes
     private float currentX = 0f; // Current X position for spawning cubes
     private bool isDequeueing = false; // Flag to check if dequeueing is in progress
-
+    public Material sphereMaterial;
     void Start()
 {
     actionText.text ="";
+    orderText.text="";
     orderText.text ="Node Order:";
+}
+
     // Get all squares within the lineParent
+    public void BFSMethod(){
+        if(squares.Count>0){
+            squares.Clear();
+        }
+        if(spheres.Count>0){
+            spheres.Clear();
+        }
+        if (cubeDictionary.Count > 0)
+        {
+            foreach (var cube in cubeDictionary.Values)
+            {
+                Destroy(cube);
+            }
+
+            // Clear the dictionary after destroying all objects
+            cubeDictionary.Clear();
+        }
+        while (numberQueue.Count > 0)
+{
+    numberQueue.Dequeue();
+}
     foreach (Transform child in lineParent.transform)
     {
         squares.Add(child);
@@ -40,7 +64,20 @@ public class Bfs : MonoBehaviour
     {
         spheres.Add(child);
     }
+    foreach (Transform square in squares)
+        {
+            
+                square.GetComponent<Renderer>().material.color = Color.white; // Change square color
+            
+        }
 
+        foreach (Transform sphere in spheres)
+        {
+            sphere.GetComponent<Renderer>().material = sphereMaterial; // Change sphere color
+
+        
+            
+        }
     // Get the TextMeshProUGUI component from the orderCanvas
     //orderText = orderCanvas.GetComponentInChildren<TextMeshProUGUI>();
 
@@ -71,7 +108,7 @@ public class Bfs : MonoBehaviour
         }
 
         // Perform queue operations after color change completes
-        StartCoroutine(PerformQueueOperations());
+        //StartCoroutine(PerformQueueOperations());
     }
 
     IEnumerator ChangeSphereColors()
@@ -331,4 +368,22 @@ public class Bfs : MonoBehaviour
         // Destroy the cube
         Destroy(cube);
     }
+    public void exitMethod(){
+    orderText.text="";
+    actionText.text="";
+    currentX-=cubeSize;
+    currentX-=gap;
+    if (cubeDictionary.Count > 0)
+        {
+            foreach (var cube in cubeDictionary.Values)
+            {
+                Destroy(cube);
+            }
+
+            // Clear the dictionary after destroying all objects
+            cubeDictionary.Clear();
+        }
+
+    StopAllCoroutines();
+}
 }

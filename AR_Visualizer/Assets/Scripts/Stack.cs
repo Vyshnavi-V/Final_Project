@@ -207,7 +207,7 @@ public class Stack : MonoBehaviour
         }
         else
         {
-            Debug.Log("Stack is empty. Cannot pop.");
+            Debug.Log("Stack is empty.Stack Underflow");
             infotext.text = "Stack is empty. Cannot pop";
 
         }

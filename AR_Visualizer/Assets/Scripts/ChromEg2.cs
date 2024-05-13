@@ -80,7 +80,7 @@ public void ChromaticMethod(){
 
 
 
-        infoText.text = "Coloring Finished";
+        infoText.text = "Coloring Finished-->Chromatic Number:2";
 
     }
 
@@ -116,6 +116,7 @@ public void ChromaticMethod(){
 }
 public void exitMethod(){
     infoText.text="";
+    textComponent.text="";
     StopAllCoroutines();
 }
 

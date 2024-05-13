@@ -106,7 +106,7 @@ public void OnSubmitButtonClick()
             {
                 numberQueue.Enqueue(trimmedNumber); // Enqueue the number
                 GenerateCubesOnPlane(trimmedNumber); // Generate and visualize the cube
-                enqueuedText.text = "Enqueued: " + trimmedNumber; // Update enqueued text
+                enqueuedText.text = "Enqueued: " + trimmedNumber +" from rear"; // Update enqueued text
                 yield return new WaitForSeconds(delay); // Add delay before enqueuing the next number
             }
         }
@@ -158,7 +158,7 @@ public void OnSubmitButtonClick()
         {
             // Dequeue the number
             string dequeuedNumber = numberQueue.Dequeue();
-            dequeuedText.text = "Dequeued: " + dequeuedNumber; // Update dequeued text
+            dequeuedText.text = "Dequeued: " + dequeuedNumber + " from front"; // Update dequeued text
             Debug.Log("Number dequeued: " + dequeuedNumber);
 
             // Check if the dequeued number exists in the cube dictionary
@@ -184,7 +184,7 @@ public void OnSubmitButtonClick()
         }
         else
         {
-            queueStatusText.text = "Queue is empty.Cannot Dequeue"; // Update queue status text
+            queueStatusText.text = "Queue is empty.Cannot Dequeue.Underflow error"; // Update queue status text
             Debug.Log("Queue is empty. Cannot dequeue.");
         }
     }

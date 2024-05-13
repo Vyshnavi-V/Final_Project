@@ -10,12 +10,16 @@ public class Chromatic : MonoBehaviour
     public TextMeshProUGUI textComponent; // Reference to the TMP Text component
     public float delayBetweenChanges = 1.0f; // Delay between color changes
     public TextMeshProUGUI infoText;
+    public Material sphereMaterial;
 
 void Start(){
     infoText.text="";
 }
 public void ChromaticMethod(){
-        StartChromatic();
+    sphere1.GetComponent<Renderer>().material = sphereMaterial;
+    sphere2.GetComponent<Renderer>().material = sphereMaterial;
+    sphere3.GetComponent<Renderer>().material = sphereMaterial;
+        StartCoroutine(StartChromatic());
     }
     private IEnumerator StartChromatic()
     {
@@ -66,7 +70,7 @@ public void ChromaticMethod(){
         yield return new WaitForSeconds(delayBetweenChanges);
 
 
-        infoText.text = "Coloring Finished";
+        infoText.text = "Coloring Finished-->Chromatic No:3";
 
     }
 
@@ -102,6 +106,7 @@ public void ChromaticMethod(){
 }
 public void exitMethod(){
     infoText.text="";
+    textComponent.text="";
     StopAllCoroutines();
 }
 

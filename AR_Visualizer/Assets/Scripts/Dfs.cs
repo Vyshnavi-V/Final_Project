@@ -29,9 +29,18 @@ public class Dfs : MonoBehaviour
     
     void Start(){
 
+        actionText.text ="";
+    orderText.text="";
+    orderText.text ="Node Order:";
     }
     public void StartDFS()
     {
+         if(squares.Count>0){
+            squares.Clear();
+        }
+        if(spheres.Count>0){
+            spheres.Clear();
+        }
         if (cubeDictionary.Count > 0)
         {
             foreach (var cube in cubeDictionary.Values)
@@ -42,27 +51,31 @@ public class Dfs : MonoBehaviour
             // Clear the dictionary after destroying all objects
             cubeDictionary.Clear();
         }
-        actionText.text ="";
-        orderText.text ="Node Order:";
+       foreach (Transform child in lineParent.transform)
+    {
+        squares.Add(child);
+    }
+
+    // Get all spheres within the sphereParent
+    foreach (Transform child in sphereParent.transform)
+    {
+        spheres.Add(child);
+    }
+    foreach (Transform square in squares)
+        {
+            
+                square.GetComponent<Renderer>().material.color = Color.white; // Change square color
+            
+        }
+
         foreach (Transform sphere in spheres)
         {
-            sphere.GetComponent<Renderer>().material = sphereMaterial;
-        }
-        foreach (Transform square in squares)
-        {
-            square.GetComponent<Renderer>().material.color = Color.white;
-        }
-        foreach (Transform child in lineParent.transform)
-        {
-            squares.Add(child);
+            sphere.GetComponent<Renderer>().material = sphereMaterial; // Change sphere color
+
+        
+            
         }
 
-        foreach (Transform child in sphereParent.transform)
-        {
-            spheres.Add(child);
-        }
-
-        orderText = orderCanvas.GetComponentInChildren<TextMeshProUGUI>();
         
 
         StartCoroutine(ChangeSquareColors());
@@ -74,7 +87,6 @@ public class Dfs : MonoBehaviour
 
     IEnumerator ChangeSquareColors()
     {
-         yield return new WaitForSeconds(squareDelayBetweenChanges);
         foreach (Transform square in squares)
         {
             string squareName = square.name;
@@ -85,12 +97,11 @@ public class Dfs : MonoBehaviour
             yield return new WaitForSeconds(squareDelayBetweenChanges);
         }
 
-        StartCoroutine(PerformQueueOperations()); // Start queue operations after square color change
+        //StartCoroutine(PerformQueueOperations()); // Start queue operations after square color change
     }
 
     IEnumerator ChangeSphereColors()
     {
-        yield return new WaitForSeconds(squareDelayBetweenChanges);
         foreach (Transform sphere in spheres)
         {
             string sphereName = sphere.name;
@@ -407,4 +418,21 @@ public class Dfs : MonoBehaviour
         // Destroy the cube
         Destroy(cube);
     }
+    public void exitMethod(){
+    orderText.text="";
+    actionText.text="";
+    currentY-=cubeSize;
+    currentY-=gap;
+    if (cubeDictionary.Count > 0)
+        {
+            foreach (var cube in cubeDictionary.Values)
+            {
+                Destroy(cube);
+            }
+
+            // Clear the dictionary after destroying all objects
+            cubeDictionary.Clear();
+        }
+    StopAllCoroutines();
+}
 }
