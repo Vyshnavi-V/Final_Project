@@ -11,9 +11,21 @@ public class ChromEg2 : MonoBehaviour
     public TextMeshProUGUI textComponent; // Reference to the TMP Text component
     public float delayBetweenChanges = 1.0f; // Delay between color changes
     public TextMeshProUGUI infoText; // Reference to the TMP Text component
+    public Material sphereMaterial;
 
 
-    IEnumerator Start()
+void Start(){
+infoText.text="";
+}
+public void ChromaticMethod(){
+    sphere1.GetComponent<Renderer>().material = sphereMaterial;
+    sphere2.GetComponent<Renderer>().material = sphereMaterial;
+    sphere3.GetComponent<Renderer>().material = sphereMaterial;
+    sphere4.GetComponent<Renderer>().material = sphereMaterial;
+    infoText.text="";
+        StartCoroutine(StartChromatic());
+    }
+    private IEnumerator StartChromatic()
     {
         // Change colors sequentially with delay
 
@@ -101,6 +113,10 @@ public class ChromEg2 : MonoBehaviour
         Vector3 offset = new Vector3(0f, -0.05f, 0f); // Adjust the downward offset
         text.rectTransform.position = position + offset; // Adjust the position of the text
     }
+}
+public void exitMethod(){
+    infoText.text="";
+    StopAllCoroutines();
 }
 
 }

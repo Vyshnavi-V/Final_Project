@@ -30,6 +30,9 @@ private ARPlane trackPlane;
     private bool searchingInProgress = false;
     private bool paused = false;
 
+void Start(){
+    
+}
     public void StartSearch(ARPlane plane)
     {
         if (searchingInProgress)

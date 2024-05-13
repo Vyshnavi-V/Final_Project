@@ -34,6 +34,7 @@ public class Stack : MonoBehaviour
     private void Start()
     {
         cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.y; // Get the size of the cube
+        infotext.text="";
         //boxCanvasRect = GameObject.FindGameObjectWithTag("BoxCanvas").GetComponent<RectTransform>(); // Find BoxCanvas by tag
 
         //GenerateBox(); // Generate and position the box
@@ -128,6 +129,7 @@ public class Stack : MonoBehaviour
     // Method to generate a cube with a given number
     private void GenerateCubesOnPlane(string number)
 {
+    infotext.text = number+" pushed onto the stack";
     //Vector3 planePosition = trackPlane.transform.position;
     Vector3 planePosition = new Vector3(-0.2f, -0.5f, 0.5f);
     // Set currentY to the plane's Y position
@@ -182,10 +184,12 @@ public class Stack : MonoBehaviour
     // Method to pop a number from the stack
     public void PopNumber()
     {
+
         if (numberStack.Count > 0)
         {
             // Pop the number
             string poppedNumber = numberStack.Pop();
+            infotext.text = poppedNumber+" popped from the top of the stack";
             Debug.Log("Number popped: " + poppedNumber);
             // Check if the popped number exists in the cube dictionary
             if (cubeDictionary.ContainsKey(poppedNumber))
@@ -204,6 +208,8 @@ public class Stack : MonoBehaviour
         else
         {
             Debug.Log("Stack is empty. Cannot pop.");
+            infotext.text = "Stack is empty. Cannot pop";
+
         }
     }
 
@@ -284,6 +290,7 @@ public void DestroyAllCubes()
 
     // Clear the number stack
     numberStack.Clear();
+    infotext.text="";
 }
 
 

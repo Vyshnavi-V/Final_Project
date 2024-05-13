@@ -11,10 +11,16 @@ public class Chromatic : MonoBehaviour
     public float delayBetweenChanges = 1.0f; // Delay between color changes
     public TextMeshProUGUI infoText;
 
-    IEnumerator Start()
+void Start(){
+    infoText.text="";
+}
+public void ChromaticMethod(){
+        StartChromatic();
+    }
+    private IEnumerator StartChromatic()
     {
         // Change colors sequentially with delay
-
+        infoText.text="";
         yield return StartCoroutine(ChangeToColor(sphere1, Color.red));
         infoText.text = "We color node 1 with color red";
         UpdateText("Red -->Yes");
@@ -93,6 +99,10 @@ public class Chromatic : MonoBehaviour
         Vector3 offset = new Vector3(0f, -0.05f, 0f); // Adjust the downward offset
         text.rectTransform.position = position + offset; // Adjust the position of the text
     }
+}
+public void exitMethod(){
+    infoText.text="";
+    StopAllCoroutines();
 }
 
 }

@@ -27,7 +27,7 @@ private float spacing = 5f;
     private Queue<string> numberQueue = new Queue<string>(); // Queue to store numbers
     private Dictionary<string, GameObject> cubeDictionary = new Dictionary<string, GameObject>(); // Dictionary to store cube GameObjects
     private float cubeSize; // Size of the cube
-    private float gap = 0.005f; // Gap between cubes
+    private float gap = 0.003f; // Gap between cubes
     private float delay = 2f; // Delay between cube generation
     private float currentX = -0.2f; // Current X position for spawning cubes
     private bool isEnqueuing = false; // Flag to check if enqueuing is in progress
@@ -36,7 +36,8 @@ private float spacing = 5f;
 
     private void Start()
     {
-        cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.x; // Get the size of the cube
+        cubeSize = cubePrefab.GetComponent<Renderer>().bounds.size.x;
+        infotext.text=""; // Get the size of the cube
     }
     /*
 public void OnSubmitButtonClick()
@@ -183,7 +184,7 @@ public void OnSubmitButtonClick()
         }
         else
         {
-            queueStatusText.text = "Queue is empty"; // Update queue status text
+            queueStatusText.text = "Queue is empty.Cannot Dequeue"; // Update queue status text
             Debug.Log("Queue is empty. Cannot dequeue.");
         }
     }
@@ -307,6 +308,7 @@ public void DestroyAllCubes()
 
     // Reset currentX
     currentX = -0.2f;
+    infotext.text="";
 }
 
 }

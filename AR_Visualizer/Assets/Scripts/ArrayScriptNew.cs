@@ -85,7 +85,7 @@ public class ArrayScriptNew : MonoBehaviour
            
         }
         DestroyCubes();
-        Vector3 planePosition = new Vector3(-0.2f, -0.5f, 0f);
+        Vector3 planePosition = new Vector3(0f, -0.5f, 0f);
         float startX = -0.5f;
         float currentX = startX;
         
@@ -141,63 +141,79 @@ public class ArrayScriptNew : MonoBehaviour
         }
        
     }
-    // public void CreateArray()
-    // {
-    //     string[] entries = entriesInputField.text.Split(','); // Split the input string by commas
+    
+   public void CreateArray()
+{
+    int arraySize = int.Parse(sizeInputField.text); // Get the size of the array from the input field
 
-    //     // Check if the number of entries matches the size of the array
-    //     int arraySize = entries.Length;
-    //     if (arraySize <= 0)
-    //     {
-    //         Debug.LogError("Array size must be a positive integer.");
-    //         return;
-    //     }
+    // Clean up previously generated cubes
+    DestroyCubes();
 
-    //     // Clean up previously generated cubes
-    //     DestroyCubes();
+    // Calculate total width
+    float totalWidth = (arraySize - 1) * spacing;
 
-    //     // Calculate total width
-    //     float totalWidth = (arraySize - 1) * spacing;
+    // Calculate starting position
+    float startX = -0.2f;
 
-    //     // Calculate starting position
-    //     float startX = -totalWidth / 2f;
+    // Split the input string by commas
+    string[] entries = entriesInputField.text.Split(',');
 
-    //     // Initialize currentX to starting position
-    //     float currentX = startX;
+    for (int i = 0; i < arraySize; i++)
+    {
+        // Calculate position for each cube
+        Vector3 cubePosition = new Vector3(startX + i * spacing, 0f, 0.5f);
 
-    //     for (int i = 0; i < arraySize; i++)
-    //     {
-    //         // Use the current position for each cube
-    //         Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+        GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
+        cubes.Add(cube);
 
-    //         GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
-    //         cubes.Add(cube);
+        // If there are entries and the current index is within the range of entries, assign them to cubes
+        if (i < entries.Length)
+        {
+            // Parse the entry to check if it's a valid number
+            int value;
+            if (int.TryParse(entries[i].Trim(), out value))
+            {
+                // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
+                TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
+                if (textMesh != null)
+                {
+                    textMesh.text = value.ToString(); // Assign the entry value to the cube
+                }
+                else
+                {
+                    Debug.LogError("TextMeshProUGUI component not found in the children of the cube prefab.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Invalid entry at index " + i);
+            }
+        }
+        else
+        {
+            // If no entry is provided for this cube, display "N"
+            TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
+            if (textMesh != null)
+            {
+                textMesh.text = "N";
+            }
+            else
+            {
+                Debug.LogError("TextMeshProUGUI component not found in the children of the cube prefab.");
+            }
+        }
+    }
 
-    //         // Update currentX for the next cube
-    //         currentX += spacing;
+    // Hide input canvas
+    //inputCanvas.SetActive(false);
 
-    //         // Access the TextMeshPro component inside the canvas of the cube prefab and update its text
-    //         TextMeshProUGUI textMesh = cube.GetComponentInChildren<TextMeshProUGUI>();
-    //         if (textMesh != null)
-    //         {
-    //             textMesh.text = entries[i].Trim(); // Assign the entry value to the cube
-    //         }
-    //         else
-    //         {
-    //             Debug.LogError("TextMeshProUGUI component not found in the children of the cube prefab.");
-    //         }
-    //     }
-    //     PositionInsertDeleteCanvas();
+    // Hide insertion canvas
+    //insertionCanvas.SetActive(false);
 
-    //     // Hide input canvas
-    //     //inputCanvas.SetActive(false);
+    // Focus camera on generated cubes
+   // FocusCameraOnCubes();
+}
 
-    //     // Hide insertion canvas
-    //     //insertionCanvas.SetActive(false);
-
-    //     // Focus camera on generated cubes
-    //    // FocusCameraOnCubes();
-    // }
     
 
     public void DestroyCubes()
@@ -263,7 +279,7 @@ IEnumerator DelayFn()
     // Otherwise, insert a new cube with the new value
     else
     {
-        Destroy(cubes[index]);
+        
         // Instantiate a new cube below the cube at the given index
         Vector3 newPosition = cubes[index].transform.position - new Vector3(0f, cubePrefab.transform.localScale.y, 0f);
         GameObject newCube = Instantiate(cubePrefab, newPosition, Quaternion.identity);
@@ -287,13 +303,13 @@ IEnumerator DelayFn()
             cubes[i].transform.position += new Vector3(spacing, 0f, 0f);
         }
         yield return new WaitForSeconds(1f);
-
         //Destroy(cubes[index]);
         // Insert the new cube into the list at the specified index
         cubes.Insert(index, newCube);
 
         // Move the new cube up by the height of the cube
         newCube.transform.position += new Vector3(0f, cubePrefab.transform.localScale.y, 0f);
+        
         yield return new WaitForSeconds(1f);
 
         // Destroy the last cube at the rightmost position
@@ -305,7 +321,7 @@ public void DeleteValueAtIndex()
 {
     int index = int.Parse(deleteIndexInputField.text);
     int value = int.Parse(cubes[index].GetComponentInChildren<TextMeshProUGUI>().text);
-    infoText.text="Value: " + value+ "inserted at index: "+index;
+    infoText.text="Value deleted from index "+index;
         firstText.text = "Left Shift perfomed on the array.";
 
 
