@@ -140,7 +140,7 @@ public class Stack : MonoBehaviour
     currentY += cubeSize+gap; // Adding a small gap between cubes
 
     // Calculate the final position of the cube
-    Vector3 finalPosition = new Vector3(0f, currentY, 2f);
+    Vector3 finalPosition = new Vector3(0f, currentY, 0.5f);
 
     // Start the coroutine to move the cube to its final position
     StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));

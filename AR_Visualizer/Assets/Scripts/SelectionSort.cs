@@ -293,7 +293,7 @@ iterationText.text="";
 
 // Move cubes up
 float cubeHeight = cubes[i].GetComponent<Renderer>().bounds.size.y;
-actiontext.text = "CubeHeight "+cubeHeight;
+//actiontext.text = "CubeHeight "+cubeHeight;
 // Define a new variable for half the cube height
 float halfCubeHeight = cubeHeight * 0.9f;
 

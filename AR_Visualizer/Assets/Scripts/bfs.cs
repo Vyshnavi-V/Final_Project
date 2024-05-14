@@ -34,6 +34,9 @@ public class Bfs : MonoBehaviour
 
     // Get all squares within the lineParent
     public void BFSMethod(){
+        actionText.text ="";
+    orderText.text="";
+    orderText.text ="Node Order:";
         if(squares.Count>0){
             squares.Clear();
         }
