@@ -253,7 +253,7 @@ private void UpdateFrontAndRearTextPositions()
         currentX += cubeSize + gap; // Adding a small gap between cubes
 
         // Calculate the final position of the cube
-        Vector3 finalPosition = new Vector3(currentX, 0f, 0f);
+        Vector3 finalPosition = new Vector3(currentX, 0f, 2f);
 
         // Start the coroutine to move the cube to its final position
         StartCoroutine(MoveCubeToPosition(cubePrefab, finalPosition, number));

@@ -960,7 +960,7 @@ public class BinaryTree : MonoBehaviour
             float posY = -node.level * verticalSpacing;
 
             // Position the visual representation of the node
-            node.visual.transform.position = new Vector3(posX, posY, 0);
+            node.visual.transform.position = new Vector3(posX, posY, 2f);
         }
     }
 

@@ -371,6 +371,7 @@ while (cubes[i].transform.position.y > originalY || cubes[minIndex].transform.po
     //userInputField.text="";
     iterationText.text="";
     actiontext.text="";
+    sortingInProgress = false;
      
 }
 private void movePPRCanvas(Canvas canvas, Vector3 position)

@@ -664,7 +664,7 @@ public class Quicksort : MonoBehaviour
         for (int i = 0; i < numbers.Length; i++)
         {
             // Calculate cube position
-            Vector3 cubePosition = new Vector3(currentX, 0f, 0f);
+            Vector3 cubePosition = new Vector3(currentX, 0f, 2f);
 
             // Instantiate cube prefab at calculated position
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);

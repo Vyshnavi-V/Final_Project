@@ -86,7 +86,7 @@ public class ArrayScriptNew : MonoBehaviour
            
         }
         DestroyCubes();
-        Vector3 planePosition = new Vector3(0f, -0.5f, 0f);
+        Vector3 planePosition = new Vector3(0f, -0.5f, 2f);
         float startX = -0.5f;
         float currentX = startX;
         
