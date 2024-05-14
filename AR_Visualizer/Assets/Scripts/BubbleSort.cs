@@ -461,7 +461,7 @@ iterationText.text="";
 
             // Adjust position relative to the plane
             // Adjust position relative to the plane
-            actiontext.text = "plane" + " " + planePosition + " " + "cube" + " " + cubePosition;
+            //actiontext.text = "plane" + " " + planePosition + " " + "cube" + " " + cubePosition;
 
             // Instantiate cube as a child of proAnchor
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity, proAnchor.transform);

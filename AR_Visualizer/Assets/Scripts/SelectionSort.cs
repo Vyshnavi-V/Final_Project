@@ -120,7 +120,7 @@ iterationText.text="";
         Vector3 iterationTextPosition = new Vector3(startX - 0.3f, 0f, 0f);
         Vector3 planePosition = plane.transform.position;
         //MoveCube(infoCanvas, planePosition);
-        actiontext.text = "Move kazhinj";
+        //actiontext.text = "Move kazhinj";
         float currentX = startX;
 
         cubes = new GameObject[numbers.Length];
@@ -128,12 +128,12 @@ iterationText.text="";
 
         for (int i = 0; i < numbers.Length; i++)
         {
-            actiontext.text = "Foril keri";
+            //actiontext.text = "Foril keri";
             Vector3 cubePosition = new Vector3(planePosition.x + currentX, planePosition.y+0.5f, planePosition.z+1f);
 
             // Adjust position relative to the plane
             Vector3 indexPosition = new Vector3(planePosition.x + currentX, planePosition.y+0.2f, planePosition.z + 1f); // Adjust position relative to the plane
-            actiontext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
+            //actiontext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
             GameObject index = Instantiate(indexPrefab, indexPosition, Quaternion.identity);
 

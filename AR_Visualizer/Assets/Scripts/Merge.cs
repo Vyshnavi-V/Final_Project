@@ -132,7 +132,7 @@ public void GenerateRandomCubes()
             cubePositions[i] = cubePosition;
             GameObject cube = Instantiate(cubePrefab, cubePosition, Quaternion.identity);
 
-            actiontext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
+            //actiontext.text = "plane"+" "+planePosition+" "+"cube"+" "+cubePosition ;
 
             currentX += spacing *0.05f;
             //movePPRCanvas(userCanvas,planePosition);
